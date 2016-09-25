@@ -1,0 +1,170 @@
+#! /usr/bin/python
+#
+# Deck.py
+# A script that generates the Serpent input deck for our SMTF-MSBR
+	
+import math
+import lattice, surfs, cells, materials
+
+
+def write_deck(fsf, pitch, slit, rfuel, rcore, r2, zcore, refl_ht, name):
+	'''Write the actual Serpent deck
+	Inputs:
+		fsf:		fuel salt fraction
+		pitch:		hexagonal pitch (cm)
+		slit:		blanket salt slit width (cm)
+		rfuel:		radius of the inner core of fuel cells (cm)	
+		rcore:		radius of the entire core, fuel + blanket (cm)
+		zcore:		height of the active core, fuel (cm)
+		refl_ht:	height of the axial reflector (cm)
+		name:		string containing name of this model
+	Outputs:
+		output:		String containing the entire input deck
+	'''	
+	
+	# Read the initial values from some external source.
+	# Right now, I'm just plugging them in to test the script.
+	FSF = 	fsf
+	PITCH = pitch # cm
+	SLIT = 	slit # cm
+	
+	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
+	# Height of each plenum: inlet and outlet
+	plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
+	gt = 6*2.54 # thickness of graphite: cm
+	ht = 3*2.54 # thickness of hastelloy, placeholder
+	fuel_cells = int(rfuel/PITCH)
+	blan_cells = 1
+	rgref = rcore + gt
+	rhast = rgref + ht
+	
+	
+	
+	# Calculate the actual dimensions based on our parameters
+	# Have benchmarked this against existing perl script--should be right
+	#
+	# inradius: half the pitch
+	hpitch = PITCH/2.0
+	# circumradius: distance from center to corner
+	d = (hpitch - SLIT) * 2.0/math.sqrt(3)  
+	# radius (inner): central fuel channel radius
+	hexarea = 2.0 * math.sqrt(3.0) * 10**2
+	ri = math.sqrt(hexarea*FSF/(2.0*math.pi) )
+	# radius (outer): auxiliary fuel channel radius
+#	ro = ri / math.sqrt(6)
+	ro = 1.1
+	# c: a constant that determines how far along the circumradius the channels appear
+	c = (ri + d*math.sqrt(3)/2.0) / ( d*(1.0 + math.sqrt(3)/2.0) )
+	# X and Y coordinates of ro
+	ro_x = c*d*math.sqrt(3)/2.0
+	ro_y = c*d*0.5
+	
+	
+	#print "hpitch:",hpitch,"\td: ", d, "\tri:", ri, "\tc: ", c
+	#print "rout", ro, "\tro_x", ro_x, "\tro_y", ro_y
+	
+	#--------------------------------
+	# Begin writing the input deck
+	
+	output = '''\
+set title "{name}"
+/*This is a  model of the:
+Small Modular Thorium Fueled Molten Salt Breeder Reactor
+Core Design Team: Dallas Moser, Igor Gussev
+Reprocessing: Devon Drey
+Advisor: Dr. Ondrej Chvala
+*/\n
+'''
+	
+		
+	LATS = range(33,33+7)
+	
+	# define the relevant universe numbers
+	ub, uf, uc, uup, uuc, ulc = range(1,7)
+	ul1, ul2, ul3, ul4 = range(25,29)
+	ulp = 10
+	uh  = 11
+	
+	# Tuple of all the universe numbers
+	UNIVERSES = (
+	ub, 	# blanket cell
+	uf,		# fuel cell 
+	uc, 	# control rod
+	uup,	# upper channel fuel
+	ul1,	# lower channel 1
+	ul2, 	# lower channel 2
+	ul3, 	# inlet plenum penetration
+	ul4, 	# outlet plenum penetration
+	ulp, 	# lower plenum (pure fuel)
+	uuc,	# upper control
+	ulc,	# lower	control
+	uh)		# pure hastelloy hex
+	
+	
+	surface_cards = surfs.write_surfs(PITCH, SLIT, d, ro, ro_x, ro_y, ri, r2, c, \
+									  rfuel, rcore, rgref, rhast, \
+									  zcore, plenum_ht, refl_ht)
+	output += surface_cards
+	
+	cell_cards = cells.write_cells(UNIVERSES, LATS, 30, 31, 32, 33)
+	output += cell_cards
+	
+	# Create the middle/active core
+	lattice_cards = lattice.write_lattice(LATS[0], ub, uf, uc, fuel_cells, blan_cells, PITCH)
+	# Create the upper plenum
+	lattice_cards += lattice.write_lattice(LATS[1], ub, uup, uuc, fuel_cells, blan_cells, PITCH)
+	# Create the lower level -1
+	lattice_cards += lattice.write_lattice(LATS[2], ub, ul1, ulc, fuel_cells, blan_cells, PITCH)
+	# Create the lower level -2
+	lattice_cards += lattice.write_lattice(LATS[3], ub, ul2, ulc, fuel_cells, blan_cells, PITCH)
+	# Create the lower level -3: penetration to inlet plenum
+	lattice_cards += lattice.write_lattice(LATS[4], uh, ul3, uh,  fuel_cells, blan_cells, PITCH)
+	# Create the lower level -4: penetration to the outlet plenum
+	lattice_cards += lattice.write_lattice(LATS[5], uh, ul4, uh,  fuel_cells, blan_cells, PITCH)
+	# Create the lower fuel plena (identical for both)
+	lattice_cards += lattice.write_lattice(LATS[6], uh, ulp, ulp, fuel_cells, blan_cells, PITCH)
+	output += lattice_cards
+	
+	mat_cards = materials.write_materials('09c')
+	output += mat_cards
+	
+	
+	data_cards = '''
+set gcu  0
+%set sym  12
+set nfg  2  0.625E-6
+
+% --- Neutron population and criticality cycles:
+
+set pop 2000 500 20
+
+
+%% --- Data Libraries
+set acelib "sss_endfb7u.xsdata"
+set nfylib "sss_endfb7.nfy"
+set declib "sss_endfb7.dec"
+'''
+	output += data_cards
+	
+	
+	plot_cards = '''
+% PLOTS
+plot 1 1500 1580 0  -300 300  -80 560
+plot 2 1500 1500 0  -300 300  -80 560
+plot 3 1500 1500 29 %[250 -100 100 -100 100]
+'''
+	output += plot_cards
+	
+	output = output.format(**locals())
+
+	return output
+
+
+if __name__ == '__main__':
+	print "This is the Serpent deck writing function for the MSR project."
+	raw_input("Press Ctrl+C to exit, or Enter to test it. ")
+
+	# First three are cell dimensions
+	print write_deck(fsf = 0.070, pitch = 11.500, slit = 0.2, r2=3.3,\
+					rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, name='test')
+	# Rest are made up dimensions close to ORNL-4528

@@ -1,0 +1,169 @@
+#! /usr/bin/python
+#
+# Cells: Write the cell cards and universes for the Serpent input deck
+
+
+def write_cells(universes, lattices, \
+				surffuel, surfcore, surfgref, surfhast):
+	'''Function to write cell cards for Serpent input deck.
+	Inputs:
+		universes:		Tuple(12) containing the following.
+		 ub, uf, uc:	 Universe number of blanket, fuel, central cells
+		 uup, ul#:		 Universe number of upper/lower plenum assembly
+		 uuc, ulc:		 Universe number of upper/lower control cells
+		lattices:		Tuple(7) containing the following:
+		 latmid:	 	 Lattice number of the middle fuel cells
+		 lattop:		 Lattice number of the top fuel cells
+		 latbot#: 		 Lattice number of the bottom fuel cells
+		surffuel:		Surface no. of inner core (fuel cells)
+		surfcore:		Surface no. of entire core, fuel+blanket
+		surfgref:		Surface no. of graphite reflector
+	Outputs:
+		cells:		String containing cell cards'''
+	
+
+	# Unpack the universe tuple
+	ub, uf, uc, uup, \
+	ul1, ul2, ul3, ul4, \
+	ulp, uuc, ulc, uh 		 = universes
+	# Unpack the lattice tuple
+	latmid, lattop, latbot1, latbot2, latbot3, \
+	latbot4, latplen = lattices
+	
+	cells = '''
+%------define cells--------------------
+
+% Universe {uf}: FUEL CELL
+cell 10 {uf} graphite -10 20 22
+cell 13 {uf} graphite 20 -21
+cell 11 {uf} blanket  -11 10 
+%cell 12 {uf} outside   11 
+cell 12 {uf} void  11 
+cell  7 {uf} fuel -20 
+cell  1 {uf} fuel 21 -22 
+
+
+
+% Universe {ub}: BLANKET CELL
+cell 15 {ub} graphite -101 %27 -28
+cell 16 {ub} blanket     101 %27 -28
+
+% Universe {uh}: HASTELLOY HEX
+cell 18 {uh} hastelloy -11
+cell 19 {uh} void       11
+
+% Universe {uc}: CONTROL ROD 
+% Similar to fuel cell, but with helium in channels
+cell 30 {uc} graphite -10 20 90 91 92 93 94 95  
+cell 41 {uc} blanket  -11 10 
+cell 401 {uc} blanket -20 
+cell 42 {uc} void   11 %27 -28
+%cell 38 {uc} void  -27
+%cell 39 {uc} void   28
+cell  34 {uc} he -90 %27 -28
+cell  35 {uc} he -91 
+cell  36 {uc} he -92 
+cell  37 {uc} he -93 
+cell  38 {uc} he -94 
+cell  39 {uc} he -95 
+
+
+
+
+
+% Universe {uup}: UPPER CHANNEL
+cell 43 {uup} fuel     -12    	28 -41	% fuel cap
+cell 44 {uup} graphite  12 -10 	28 -42	% graphite,level1
+cell 45 {uup} graphite -12      41 -42	% graphite cap,level2
+cell 46 {uup} blanket  -11 10 	28 -42  % slit all the way through
+cell 47 {uup} void      42
+cell 48 {uup} void     -28
+cell 49 {uup} void      11 		28 -42
+
+% Universe {ul1}: LOWER CHANNEL 1
+cell 51 {ul1} blanket -11 55 
+cell 52 {ul1} fuel -20    % -27 56  % Central channel
+cell 53 {ul1} hastelloy -53  20 % -27 56  % Hast. pipe
+cell 54 {ul1} fuel -54  53 % -27 56  % outer fuel channel
+cell 55 {ul1} graphite -55 54 % 52 % graphite hex
+cell 59 {ul1} void 11
+
+% Universe {ul2}: LOWER CHANNEL 2
+cell 251 {ul2} blanket -11 57 
+cell 252 {ul2} fuel -20    % -27 56  % Central channel
+cell 253 {ul2} hastelloy -53  20 % -27 56  % Hast. pipe
+cell 254 {ul2} fuel -54  53 % -27 56  % outer fuel channel
+cell 257 {ul2} hastelloy -57 54 % -27 56 % outer pipe
+cell 259 {ul2} void 11
+
+% Universe {ulp}: LOWER PLENUM
+cell 250 {ulp} fuel -11
+cell 260 {ulp} void  11
+
+% Universe {ul3}: PENENETRATION TO INLET PLENUM
+cell 261 {ul3} hastelloy -11 54
+cell 262 {ul3} fuel -20          % Central channel
+cell 263 {ul3} hastelloy -53  20 % Inner pipe
+cell 264 {ul3} fuel -54  53      % outer fuel channel
+cell 265 {ul3} void 11
+% Universe {ul4}: PENETRATION TO OUTLET PLENUM
+cell 266 {ul4} hastelloy -11 20
+cell 267 {ul4} fuel -20
+cell 268 {ul4} void 11
+
+% Universe {uuc}: UPPER CONTROL
+cell 61 {uuc} graphite       -12  28 -41	% graphite cap
+cell 62 {uuc} graphite  12 -10 	28 -42	% graphite,level1
+cell 63 {uuc} graphite -12      41 -42	% graphite cap,level2
+cell 64 {uuc} blanket  -11 10 	28 -42  % slit all the way through
+cell 65 {uuc} void      42
+cell 66 {uuc} void     -28
+cell 67 {uuc} void      11 		28 -42
+
+% Universe {ulc}: LOWER CONTROL
+cell 71 {ulc} graphite -20               % Central channel
+cell 72 {ulc} hastelloy -53  20    % Hast. pipe
+cell 73 {ulc} graphite -54  53           % outer fuel channel
+cell 74 {ulc} graphite -55 54      % graphite hex
+cell 75 {ulc} blanket  -11 55      % blanket reflector
+cell 79 {ulc} void  11 
+
+
+% The main universe
+cell 100 0 fill    {latmid} -{surfcore}     27 -28
+
+%cell 101 0 blanket {surffuel} -{surfcore}   61 -42 
+cell 102 0 hastelloy {surfcore} -{surfgref}  61 -81
+cell 104 0 fill   {lattop} -{surffuel}      28 -42
+cell 105 0 fill   {latbot1} -{surffuel}     52 -27
+cell 106 0 fill   {latbot2} -{surffuel}     56 -52
+cell 107 0 fill   {latbot3} -{surffuel}	  	61 -56
+cell 108 0 fill   {latplen} -{surffuel}	  	62 -61
+cell 109 0 fill   {latbot4} -{surffuel}	  	63 -62
+cell 110 0 fill   {latplen} -{surffuel}	  	64 -63
+cell 111 0 hastelloy       -{surfgref}		60 -64
+cell 112 0 hastelloy {surffuel} -{surfgref} 64 -61
+cell 113 0 hastelloy {surfgref} -{surfhast} 60 -81
+cell 120 0 blanket  	 	    -{surfcore} 42 -80 102
+cell 121 0 hastelloy	 	    -{surfcore} 80 -81
+cell 122 0 hastelloy	 	    -{surfhast} 81 -82
+cell 133 0 graphite                       -102
+
+
+
+cell 999 0 outside {surfhast} 60 -82
+cell 998 0 outside -60
+cell 997 0 outside  82
+'''
+
+	cells = cells.format(**locals())
+	return cells
+
+if __name__ == '__main__':
+	print "This is a module to write cells for the MSR core."
+	raw_input("Press Ctrl+C to quit, or enter else to test it. ")
+	
+	# The test
+	us = range(1,1+12)
+	lats = range(33,33+7)
+	print write_cells(us, lats, 30, 31, 32, 29)
