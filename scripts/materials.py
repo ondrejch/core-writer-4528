@@ -1,17 +1,16 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 #
 # Materials: Writes the material cards for the Serpent input deck.
 
 
-def write_materials(lib):
-	'''Function to write material cards for Serpent input deck.
-	Inputs: 
-		lib:	String containing the neutron cross section library
-				to use (e.g., 09c).
-	Outputs:
-		mats:	String containing the material cards'''
-	
-	mats = '''
+def write_materials(lib='09c'):
+    '''Function to write material cards for Serpent input deck.
+Inputs: 
+    lib:    String containing the neutron cross section library to use.
+Outputs:
+    mats:    String containing the material cards'''
+    
+    mats = '''
 %-------material definition--------------
 %NOTE: VOLUMES OR MASS OF EACH MAY NEED TO 
 %BE CALCULATED FOR BURNUP CALCULATIONS
@@ -101,12 +100,12 @@ rgb 139 69 19
  29063.{lib}  -0.002421   %  Cu
  29065.{lib}  -0.001079   %  Cu
 '''
-	mats = mats.format(**locals())
+    mats = mats.format(**locals())
 
-	return mats
+    return mats
 
 
 if __name__ == '__main__':
-	print "This is a module to write materials for the MSR core."
-	raw_input("Press Ctrl+C to quit, or enter else to test it. ")
-	print write_materials('09c')
+    print("This is a module to write materials for the MSR core.")
+    input("Press Ctrl+C to quit, or enter else to test it. ")
+    print(write_materials())
