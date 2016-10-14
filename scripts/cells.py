@@ -1,10 +1,10 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 #
 # Cells: Write the cell cards and universes for the Serpent input deck
 
 
-def write_cells(universes, lattices, \
-				surffuel, surfcore, surfgref, surfhast):
+def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
+				surffuel=30, surfcore=31, surfgref=32, surfhast=29):
 	'''Function to write cell cards for Serpent input deck.
 	Inputs:
 		universes:		Tuple(12) containing the following.
@@ -160,10 +160,6 @@ cell 997 0 outside  82
 	return cells
 
 if __name__ == '__main__':
-	print "This is a module to write cells for the MSR core."
-	raw_input("Press Ctrl+C to quit, or enter else to test it. ")
-	
-	# The test
-	us = range(1,1+12)
-	lats = range(33,33+7)
-	print write_cells(us, lats, 30, 31, 32, 29)
+	print("This is a module to write cells for the MSR core.")
+	input("Press Ctrl+C to quit, or enter else to test it. ")
+	print (write_cells())

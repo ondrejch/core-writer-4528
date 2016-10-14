@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 #
 # Deck.py
 # A script that generates the Serpent input deck for our SMTF-MSBR
@@ -7,7 +7,11 @@ import math
 import lattice, surfs, cells, materials
 
 
-def write_deck(fsf, pitch, slit, rfuel, rcore, r2, zcore, refl_ht, name):
+def write_deck(channel_pitch = 11.500, 
+    salt_fraction = 0.07;
+    slit = 0.2, r2=3.3, fsf = 0.070, 
+    rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, 
+    name='Test deck'):
 	'''Write the actual Serpent deck
 	Inputs:
 * channel_pitch:  hexagonal pitch of fuel cells [cm]
@@ -38,8 +42,8 @@ def write_deck(fsf, pitch, slit, rfuel, rcore, r2, zcore, refl_ht, name):
 		output:		String containing the entire input deck
 	'''	
 # TODO 
-channel_r1 = 
-channel_r3 = 
+    channel_r1 = 
+    channel_r3 = 
 
 	# Read the initial values from some external source.
 	# Right now, I'm just plugging them in to test the script.
@@ -180,10 +184,6 @@ plot 3 1500 1500 29 %[250 -100 100 -100 100]
 
 
 if __name__ == '__main__':
-	print "This is the Serpent deck writing function for the MSR project."
-	raw_input("Press Ctrl+C to exit, or Enter to test it. ")
-
-	# First three are cell dimensions
-	print write_deck(fsf = 0.070, pitch = 11.500, slit = 0.2, r2=3.3,\
-					rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, name='test')
-	# Rest are made up dimensions close to ORNL-4528
+	print("This is the Serpent deck writing function for the MSR project.")
+	input("Press Ctrl+C to exit, or Enter to test it. ")
+	print(write_deck())
