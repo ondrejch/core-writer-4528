@@ -10,18 +10,37 @@ import lattice, surfs, cells, materials
 def write_deck(fsf, pitch, slit, rfuel, rcore, r2, zcore, refl_ht, name):
 	'''Write the actual Serpent deck
 	Inputs:
-		fsf:		fuel salt fraction
-		pitch:		hexagonal pitch (cm)
-		slit:		blanket salt slit width (cm)
-		rfuel:		radius of the inner core of fuel cells (cm)	
-		rcore:		radius of the entire core, fuel + blanket (cm)
-		zcore:		height of the active core, fuel (cm)
-		refl_ht:	height of the axial reflector (cm)
-		name:		string containing name of this model
+* channel_pitch:  hexagonal pitch of fuel cells [cm]
+* channel_r2: inner radius of the outer fuel channel [cm]
+* channel_top_r: radius of the channel holder knob [cm]                          
+* channel_top_h: height the channel holder knob [cm]                          
+* blanket_slit:   thickness of blanket salt slit [cm]
+* salt_fraction:  salt fraction in the central channel [fraction]
+* crod_positions: tuple of [x,y] describing CR channel position(s), indexed in channel numbers. [0,0] is the center.
+* r_core:  radius of the inner core (fuel only) [cm]
+* r_tank:  radius of the core + hastelloy container [cm]
+* h_plena: height of each of the lower plena [cm]
+* z_core: height of the graphite channels [cm]
+* z_tank: height of the hastelloy tank [cm]
+* tank_thick: hastelloy thickness [cm]
+* holder_thick: holder plate thickness [cm]
+* name:		string containing name of this model
+
+# OLD		fsf:		fuel salt fraction
+#		pitch:		hexagonal pitch (cm)
+#		slit:		blanket salt slit width (cm)
+#		rfuel:		radius of the inner core of fuel cells (cm)	
+#		rcore:		radius of the entire core, fuel + blanket (cm)
+#		zcore:		height of the active core, fuel (cm)
+#		refl_ht:	height of the axial reflector (cm)
+#		name:		string containing name of this model
 	Outputs:
 		output:		String containing the entire input deck
 	'''	
-	
+# TODO 
+channel_r1 = 
+channel_r3 = 
+
 	# Read the initial values from some external source.
 	# Right now, I'm just plugging them in to test the script.
 	FSF = 	fsf
