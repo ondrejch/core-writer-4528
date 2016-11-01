@@ -8,13 +8,16 @@
 import math
 
 
-def write_surfs(pitch, slit, d, ro, rox, roy, ri, r2, c, rfuel, rcore, rgref, rhast, zcore, pht, zrefl):
+def write_surfs(pitch, slit, d, ro, rox, roy, r1, r2, c, rfuel, rcore, rgref, rhast, zcore, pht, zrefl):
 	'''Function to write the surfaces for our MSBR Serpent model
 	Inputs:
 		pitch:  hexagonal pitch of fuel cells
 		slit:   thickness of blanket salt slit
 		d:      circumradius of hexagon
 		ri:     central fuel channel radius
+		r1:     central fuel channel radius
+		r2:     radius of concentric graphite ring
+		r3:     radius of outer fuel channel ring
 		ro:     auxiliary fuel channel radius
 		rox:    x coordinate of aux center
 		roy:    y coordinate of aux center
@@ -29,14 +32,14 @@ def write_surfs(pitch, slit, d, ro, rox, roy, ri, r2, c, rfuel, rcore, rgref, rh
 	Output:
 		surfaces:   string containing the surface cards for the MSR'''
 	
-	# Radial reflector scaling term
+'''	# Radial reflector scaling term
 	rs = 0.9
 		
 	# r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
-	r2 = math.sqrt(2*ri**2 + 2*ri*thast + thast**2) # outer fuel cylinder
+	r2 = math.sqrt(2*r1**2 + 2*r1*thast + thast**2) # outer fuel cylinder
 	# Radius of outer fuel ring with equal volume to inner fuel channel
-	r3 = math.sqrt(ri**2 + r2**2)
+	r3 = math.sqrt(r1**2 + r2**2)
 	rdiff = (r3 - r2)
 	# Establish a few additional dimensions
 	hexs = pitch/2.0    # radius of cell, outside slit
@@ -59,11 +62,11 @@ def write_surfs(pitch, slit, d, ro, rox, roy, ri, r2, c, rfuel, rcore, rgref, rh
 	# We want this to converge to another channel with concentric
 	# cylinders at the lower plenum
 	# Graphite thickness between central channel and aux channel
-	gt1 = d*c - rdiff - ri
+	gt1 = d*c - rdiff - r1
 	# Next layer down concentric circles with half the graphite thickness
 	# thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
-	rh = ri + thast									# radius of hastelloy cyl
+	rh = r1 + thast									# radius of hastelloy cyl
 	rg = (gt1/2.0 + r2)    				   			# radius of graphite hex
 	# And cut off the bottom 10 inches below that
 	ztrans1 = 0 - 10*2.54
@@ -86,26 +89,26 @@ def write_surfs(pitch, slit, d, ro, rox, roy, ri, r2, c, rfuel, rcore, rgref, rh
 	# Top reflector thickness
 	botrt = zhexf2
 	toprt = botrt + 10
+'''
 
-
-	surfaces = '''
+'''	surfaces = \'''
 %------define the hexagon and fuel channel cells----
 surf 10 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
 surf 11 hexxc 0   0   {hexs}	      % HEX FOR SLIT
-surf 12 hexxc 0   0   {hexf}          % HEX FOR FUEL
+surf 12 hexxc 0   0   {hexf}          % HEX FOR FUEL used in channel cap
 surf 20 cyl   0   0   {ri}	    % CENTER HOLE
 surf 21 cyl   0   0   {r2}     % INTERMEDIATE GRAPHITE RING
 surf 22 cyl   0   0   {r3}     % OUTER FUEL RING
 surf 27 pz    0			    % BOTTOM OF CORE
 surf 28 pz    {zcore}		     % HEIGHT OF CORE
-surf 30 cyl   0   0   {rfuel}
-surf 31 cyl   0   0   {rcore}
-surf 32 cyl   0   0   {rgref}
-surf 33 cyl   0   0   {rhast}
-surf 41 pz    {zhexf1}
-surf 42 pz    {zhexf2}
-surf 51 cone  0 0 0 {hexg}  -{hexg}
-surf 52 pz    {ztrans1}
+surf 30 cyl   0   0   {rfuel}   % CYLINDRICAL BOUNDS FOR FUEL LATTICE
+surf 31 cyl   0   0   {rcore}   % CYLINDRICAL BOUNDS FOR FUEL AND BLANKET
+surf 32 cyl   0   0   {rgref}   % CYLINDRICAL BOUNDS FOR GRAPHITE + PREVIOUS 2
+surf 33 cyl   0   0   {rhast}   % ENTIRE CORE CYLIDNRICAL BOUNDS
+surf 41 pz    {zhexf1}          % BOTTOM OF GRAPHITE CAP
+surf 42 pz    {zhexf2}          % TOP OF GRAPHITE CAP
+surf 51 cone  0 0 0 {hexg}  -{hexg}  % NOT USED
+surf 52 pz    {ztrans1}       % BOTTOM OF A LATTICE
 surf 53 cyl   0   0   {rh}   % hastelloy tube radius
 surf 54 cyl   0   0   {r2}   % outer fuel cyl radius
 surf 55 hexxc 0   0   {rg}	% Hex for fuel transition
@@ -127,7 +130,46 @@ surf 94 cyl  -{rox} -{roy}  {ro}
 surf 95 cyl   {rox} -{roy}  {ro}
 surf 101 hexxc 0   0   {rr}	     % HEX FOR RADIAL GRAPHITE REFLECTOR
 surf 102 cylz 0  0 {rfuel} {botrt} {toprt}
+\'''
 '''
+
+	surfaces = '''
+%------ main universe ------
+surf 1 cyl   0   0   {rfuel}         % CYLINDRICAL BOUNDS FOR FUEL LATTICE
+surf 2 cyl   0   0   {rcore_inner}   % CYLINDRICAL BOUNDS FOR FUEL AND REFLECTOR
+surf 3 cyl   0   0   {rcore_outer}   % CYLINDRICAL BOUNDS FOR ENTIRE CORE
+
+%------ define the hexagon and fuel channel cells ------	
+surf 101 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
+surf 102 hexxc 0   0   {hexs}	     % HEX FOR SLIT
+surf 103 cyl   0   0   {r1}	         % CENTER HOLE
+surf 104 cyl   0   0   {r2}          % INTERMEDIATE GRAPHITE RING
+surf 105 cyl   0   0   {r3}          % OUTER FUEL RING
+surf 198 pz    0			         % BOTTOM OF CORE
+surf 199 pz    {zcore}		         % HEIGHT OF CORE
+
+%------ define the hexagon and control rod channels ------
+surf 201 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
+surf 202 hexxc 0   0   {hexs}	     % HEX FOR SLIT
+surf 203 cyl   0   0   {r1}  	     % CENTER HOLE
+surf 204 cyl   0   {ry}   {ro}	     % OUTER HOLES x 6 CONTROL RODS
+surf 205 cyl   0  -{ry}   {ro}       %           ||
+surf 206 cyl   {rox}  {roy}  {ro}    %           ||
+surf 207 cyl  -{rox}  {roy}  {ro}    %          _||_
+surf 208 cyl  -{rox} -{roy}  {ro}    %          \  /
+surf 209 cyl   {rox} -{roy}  {ro}    % __________\/____________
+surf 298 pz    0			         % BOTTOM OF CORE
+surf 299 pz    {zcore}		         % HEIGHT OF CORE
+
+%------ define hexagon for radial graphite reflector ------
+surf 301 hexxc 0   0   {rs*hexg}	     % HEX FOR REFLECTOR GRAPHITE
+% surf 102 hexxc 0   0   {hexs}	          % HEX FOR SLIT
+surf 398 pz    0			         % BOTTOM OF CORE
+surf 399 pz    {zcore}		         % HEIGHT OF CORE
+'''
+
+
+
 
 	surfaces = surfaces.format(**locals())
 	
