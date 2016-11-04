@@ -22,10 +22,10 @@ def write_surfs(pitch, slit, d, ro, rox, roy, r1, r2, c, rfuel, rcore, rgref, rh
 		rox:    x coordinate of aux center
 		roy:    y coordinate of aux center
 		c:      ratio of (rox,roy) to d
-		rfuel:  radius of the inner core (fuel only)
+		rfuel:  radius of the inner core (fuel only)  (rfuel)
 		rcore:  radius of the outer core (fuel+blanket)
-		rgref:  radius of the core + graphite reflector
-		rhast:  radius of the core + graphite + hastelloy container
+		rgref:  radius of the core + graphite reflector (rcore_inner)
+		rhast:  radius of the core + graphite + hastelloy container (rcore_outer)
 		pht:	height of each of the lower plena
 		zcore:	height of the core
 		zrefl:	height of the axial reflector
@@ -139,7 +139,7 @@ surf 1 cyl   0   0   {rfuel}         % CYLINDRICAL BOUNDS FOR FUEL LATTICE
 surf 2 cyl   0   0   {rcore_inner}   % CYLINDRICAL BOUNDS FOR FUEL AND REFLECTOR
 surf 3 cyl   0   0   {rcore_outer}   % CYLINDRICAL BOUNDS FOR ENTIRE CORE
 
-%------ define the hexagon and fuel channel cells ------	
+%------ graphite hexagon and fuel channel cells ------	
 surf 101 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
 surf 102 hexxc 0   0   {hexs}	     % HEX FOR SLIT
 surf 103 cyl   0   0   {r1}	         % CENTER HOLE
@@ -148,7 +148,7 @@ surf 105 cyl   0   0   {r3}          % OUTER FUEL RING
 surf 198 pz    0			         % BOTTOM OF CORE
 surf 199 pz    {zcore}		         % HEIGHT OF CORE
 
-%------ define the hexagon and control rod channels ------
+%------ graphite hexagon and control rod channels ------
 surf 201 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
 surf 202 hexxc 0   0   {hexs}	     % HEX FOR SLIT
 surf 203 cyl   0   0   {r1}  	     % CENTER HOLE
@@ -161,11 +161,19 @@ surf 209 cyl   {rox} -{roy}  {ro}    % __________\/____________
 surf 298 pz    0			         % BOTTOM OF CORE
 surf 299 pz    {zcore}		         % HEIGHT OF CORE
 
-%------ define hexagon for radial graphite reflector ------
-surf 301 hexxc 0   0   {rs*hexg}	     % HEX FOR REFLECTOR GRAPHITE
-% surf 102 hexxc 0   0   {hexs}	          % HEX FOR SLIT
+%------ graphite hexagon for radial graphite reflector ------
+surf 301 hexxc 0   0   {rs*hexg}	 % HEX FOR REFLECTOR GRAPHITE
 surf 398 pz    0			         % BOTTOM OF CORE
 surf 399 pz    {zcore}		         % HEIGHT OF CORE
+
+%------ fuel channel cap and holding shaft ------
+surf 401 cyl   0   0   {r3}          % FUEL CAP ABOVE FUEL CHANNELS
+surf 402 hexxc 0   0   {hexg}        % GRAPHITE HEX AROUND FUEL CAP
+surf 403 cyl   0   0   {TBD}         % CYLINDRICAL HOLDING SHAFT
+surf 496 pz    {zcore}		         % TOP OF FUEL IN CORE
+surf 497 pz    {z_cap_fuel}          % TOP OF INNER CAP
+surf 498 pz    {z_cap_graphite}      % TOP OF GRAPHITE IN CAP
+surf 499 pz    {z_shaft}             % TOP OF HOLDING SHAFT
 '''
 
 
