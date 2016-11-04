@@ -169,11 +169,21 @@ surf 399 pz    {zcore}		         % HEIGHT OF CORE
 %------ fuel channel cap and holding shaft ------
 surf 401 cyl   0   0   {r3}          % FUEL CAP ABOVE FUEL CHANNELS
 surf 402 hexxc 0   0   {hexg}        % GRAPHITE HEX AROUND FUEL CAP
-surf 403 cyl   0   0   {TBD}         % CYLINDRICAL HOLDING SHAFT
 surf 496 pz    {zcore}		         % TOP OF FUEL IN CORE
 surf 497 pz    {z_cap_fuel}          % TOP OF INNER CAP
 surf 498 pz    {z_cap_graphite}      % TOP OF GRAPHITE IN CAP
-surf 499 pz    {z_shaft}             % TOP OF HOLDING SHAFT
+
+%------ holding plate ------
+surf 501 cyl   0   0   {TBD}         % TOP HOLDING PLATE
+surf 502 cyl   0   0   {TBD}         % CYLINDRICAL HOLDING SHAFT
+surf 597 pz    {z_cap_graphite}      % BOTTOM OF HOLDING PLATE
+surf 598 pz    {z_holding_plate}     % TOP OF HOLDING PLATE
+surf 599 pz    {z_shaft}             % TOP OF HOLDING SHAFT
+
+%------ top graphite reflector ------
+surf 601 cyl   0   0   {TBD}         % TOP AXIAL GRAPHITE REFLECTOR
+surf 698 pz    {TBD}                 % BOTTOM OF REFELECTOR
+surf 699 pz    {TBD}                 % TOP OF REFLECTOR
 '''
 
 
