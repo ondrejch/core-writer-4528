@@ -142,11 +142,11 @@ surf 3 cyl   0   0   {rcore_outer}   % CYLINDRICAL BOUNDS FOR ENTIRE CORE
 %------ graphite hexagon and fuel channel cells ------	
 surf 101 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
 surf 102 hexxc 0   0   {hexs}	     % HEX FOR SLIT
-surf 103 cyl   0   0   {r1}	         % CENTER HOLE
+surf 103 cyl   0   0   {r1}	     % CENTER HOLE
 surf 104 cyl   0   0   {r2}          % INTERMEDIATE GRAPHITE RING
 surf 105 cyl   0   0   {r3}          % OUTER FUEL RING
-surf 198 pz    0			         % BOTTOM OF CORE
-surf 199 pz    {zcore}		         % HEIGHT OF CORE
+surf 198 pz    0		     % BOTTOM OF CORE
+surf 199 pz    {zcore}		     % HEIGHT OF CORE
 
 %------ graphite hexagon and control rod channels ------
 surf 201 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
@@ -158,32 +158,33 @@ surf 206 cyl   {rox}  {roy}  {ro}    %           ||
 surf 207 cyl  -{rox}  {roy}  {ro}    %          _||_
 surf 208 cyl  -{rox} -{roy}  {ro}    %          \  /
 surf 209 cyl   {rox} -{roy}  {ro}    % __________\/____________
-surf 298 pz    0			         % BOTTOM OF CORE
-surf 299 pz    {zcore}		         % HEIGHT OF CORE
+surf 298 pz    0		     % BOTTOM OF CORE
+surf 299 pz    {zcore}		     % HEIGHT OF CORE
 
 %------ graphite hexagon for radial graphite reflector ------
-surf 301 hexxc 0   0   {rs*hexg}	 % HEX FOR REFLECTOR GRAPHITE
-surf 398 pz    0			         % BOTTOM OF CORE
-surf 399 pz    {zcore}		         % HEIGHT OF CORE
+surf 301 hexxc 0   0   {rs*hex}      % HEX FOR REFLECTOR GRAPHITE
+surf 398 pz    0	             % BOTTOM OF CORE
+surf 399 pz    {zcore}		     % HEIGHT OF CORE
 
 %------ fuel channel cap and holding shaft ------
 surf 401 cyl   0   0   {r3}          % FUEL CAP ABOVE FUEL CHANNELS
 surf 402 hexxc 0   0   {hexg}        % GRAPHITE HEX AROUND FUEL CAP
-surf 496 pz    {zcore}		         % TOP OF FUEL IN CORE
+surf 402 cyl   0   0   {r_shaft}     % CYLINDRICAL HOLDING SHAFT
+surf 496 pz    {zcore}		     % TOP OF FUEL IN CORE
 surf 497 pz    {z_cap_fuel}          % TOP OF INNER CAP
 surf 498 pz    {z_cap_graphite}      % TOP OF GRAPHITE IN CAP
-
-%------ holding plate ------
-surf 501 cyl   0   0   {TBD}         % TOP HOLDING PLATE
-surf 502 cyl   0   0   {TBD}         % CYLINDRICAL HOLDING SHAFT
-surf 597 pz    {z_cap_graphite}      % BOTTOM OF HOLDING PLATE
-surf 598 pz    {z_holding_plate}     % TOP OF HOLDING PLATE
-surf 599 pz    {z_shaft}             % TOP OF HOLDING SHAFT
+surf 499 pz    {z_shaft}             % TOP OF HOLDING SHAFT
 
 %------ top graphite reflector ------
-surf 601 cyl   0   0   {TBD}         % TOP AXIAL GRAPHITE REFLECTOR
-surf 698 pz    {TBD}                 % BOTTOM OF REFELECTOR
-surf 699 pz    {TBD}                 % TOP OF REFLECTOR
+surf 501 cyl   0   0   {topr_r}      % TOP AXIAL GRAPHITE REFLECTOR
+surf 598 pz    {z_topr_bot}          % BOTTOM OF REFELECTOR
+surf 599 pz    {z_topr_top}          % TOP OF REFLECTOR
+
+%------ holding plate ------
+surf 601 cyl   0   0   {r_plate}     % TOP HOLDING PLATE
+surf 698 pz    {z_cap_graphite}      % BOTTOM OF HOLDING PLATE
+surf 699 pz    {z_plate}             % TOP OF HOLDING PLATE
+
 '''
 
 
