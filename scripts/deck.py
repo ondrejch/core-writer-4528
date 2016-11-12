@@ -3,12 +3,12 @@
 # Deck.py
 # A script that generates the Serpent input deck for our SMTF-MSBR
 	
-import math
+import math #HOW DARE SOMEONE USE MATH AND NOT NUMPY. 
 import lattice, surfs, cells, materials
 
 
 def write_deck(channel_pitch = 11.500, 
-    salt_fraction = 0.07;
+    salt_fraction = 0.07,
     slit = 0.2, r2=3.3, fsf = 0.070, 
     rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, 
     name='Test deck'):

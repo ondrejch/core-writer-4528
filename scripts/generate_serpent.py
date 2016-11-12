@@ -7,6 +7,7 @@
 
 import deck
 import os
+import numpy as np
 
 # Parameters from the MCNP optimization
 FSF = 0.07
@@ -18,50 +19,57 @@ RCORE = 215
 ZCORE = 400
 ZREFL = 100
 
+
+#Job submission settings:
 FILENAME = "msbr.inp"
-QSUBLOC = "/home/tlabossi/MSR/qsub.sh"
+qsubtemplate = 'qsubtemplate.txt'
+nperjob = 2 #num nodes per job
+ncpu = 8 #cpu per job
+queue = 'gen5'
 
-# Before iterating, do this quick test
-fails = os.system('mkdir s0.108')
-if fails:
-	print "ERROR: Cannot create file/directory for writing. Aborting."
-	exit()
-# Otherwise, clean up and continue with the script
-os.system('rmdir s0.108')
-
+#now the qsub text is constructed.
+qtext=[]
+with open(qsubtemplate, 'r') as temp:
+    text=temp.read()
+    for line in text:
+       qtext.append(line.format(**locals())) 
 
 # From .108 cm to .327 cm
-slits = range(108, 327, 3)
-#slits = range(108, 111, 3) #just to test
-# Generate for each slit width we want to try
+# 73 different slit widths are attempted.
+slits = np.linspace(0.108, 0.327, 73)
+
 for s in slits:
-	# Scale by a factor of 1000 and convert to float
-	s *= .001
 
-	title = "SMTFMSBR: slit = " + str(s)
+    title = "SMTFMSBR: slit = " + str(s)
 
 
-	# Make the deck
-	serp_deck = deck.write_deck(fsf = FSF, pitch = PITCH, slit = s, \
-				rfuel = RFUEL, rcore = RCORE, r2 = R2, zcore = ZCORE, refl_ht = ZREFL,
-				name = title)
-	
+    # Make the deck
+    serp_deck = deck.write_deck(fsf = FSF, pitch = PITCH, slit = s,
+                            rfuel = RFUEL, rcore = RCORE, r2 = R2, zcore = ZCORE, refl_ht = ZREFL,
+                            name = title)
+    
+    # create the directory
+    dirname = 's' + str(s) + '/'
+    os.mkdir(dirname)
 
-	dirname = 's' + str(s) + '/'
-	fails = os.system('mkdir ' + dirname)
-	if fails:
-		print "Could not create directory", dirname, " - trying the next one"
-	else:
-		try:
-			fname = dirname + FILENAME
-			f = open(fname, 'w')
-			f.write(serp_deck)
-			f.close()
-		except IOError as e:
-			print "Unable to write to file", fname
-			print e
-		else:
-			# Do the qsub bit
-			os.system('cd ' + dirname + '; cp ' + QSUBLOC + ' .; qsub qsub.sh')
+    # go into the directory to run this lattice in
+    os.chdir(dirname)
+
+    # now write out the input file.
+    with open(FILENAME, 'w') as f:
+        f.write(serp_deck)
+
+    # place a qsub script with a descriptive name here.
+    with open('{}.sh'.format(dirname),'w') as f:
+        f.write(qtext)
+
+    #and finally, submit the job.
+    #os.system('qsub {}'.format(FILENAME+'.sh'))
+
+    #and now return to the original directory.
+    os.chdir('..')
+        
+                        
+                        
 
 print "All done."

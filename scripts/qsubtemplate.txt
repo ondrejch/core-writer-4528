@@ -1,0 +1,16 @@
+#this one assumes that MPI is being used.
+# otherwise it is better to use this without mpirun.
+
+#!/bin/bash
+#PBS -V
+#PBS -q {queue}
+#PBS -l nodes={nperjob}:ppn={ncpu}
+
+
+#### Executable Line
+cd ${PBS_O_WORKDIR}
+
+module load mpi
+module load serpent
+
+mpirun -npernode 1 sss2 -omp {ncpu} ./{FILENAME} > ./{FILENAME}_out.txt
