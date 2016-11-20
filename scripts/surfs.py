@@ -185,6 +185,12 @@ surf 601 cyl   0   0   {r_plate}     % TOP HOLDING PLATE
 surf 698 pz    {z_cap_graphite}      % BOTTOM OF HOLDING PLATE
 surf 699 pz    {z_plate}             % TOP OF HOLDING PLATE
 
+%------ lower plenum ------
+surf 701 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 702 cyl   0   0   {r1}	    % CENTER HOLE
+surf 703 cyl   0   0   {rh}   % hastelloy tube radius
+surf 704 cyl   0   0   {r2}   % outer fuel cyl radius
+
 '''
 
 
