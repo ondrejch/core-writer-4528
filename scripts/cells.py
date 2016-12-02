@@ -22,7 +22,7 @@ def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
 		cells:		String containing cell cards'''
 	
 
-	# Unpack the universe tuple
+'''	# Unpack the universe tuple
 	ub, uf, uc, uup, \
 	ul1, ul2, ul3, ul4, \
 	ulp, uuc, ulc, uh 		 = universes
@@ -30,7 +30,7 @@ def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
 	latmid, lattop, latbot1, latbot2, latbot3, \
 	latbot4, latplen = lattices
 	
-	cells = '''
+	cells = \'''
 %------define cells--------------------
 
 % Universe {uf}: FUEL CELL
@@ -154,6 +154,19 @@ cell 133 0 graphite                       -102
 cell 999 0 outside {surfhast} 60 -82
 cell 998 0 outside -60
 cell 997 0 outside  82
+\'''
+'''
+
+
+# New cell definitions
+cells = \'''
+% Universe {uf}: FUEL CELL
+cell 10 {uf} graphite -101 103 105
+cell 13 {uf} graphite 103 -104
+cell 11 {uf} blanket  -102 101 
+cell 12 {uf} void  102 
+cell  7 {uf} fuel -103 
+cell  1 {uf} fuel 104 -105 
 '''
 
 	cells = cells.format(**locals())

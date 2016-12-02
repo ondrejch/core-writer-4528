@@ -133,6 +133,7 @@ surf 102 cylz 0  0 {rfuel} {botrt} {toprt}
 \'''
 '''
 
+# New surface definitions
 	surfaces = '''
 %------ main universe ------
 surf 1 cyl   0   0   {rfuel}         % CYLINDRICAL BOUNDS FOR FUEL LATTICE
@@ -185,11 +186,32 @@ surf 601 cyl   0   0   {r_plate}     % TOP HOLDING PLATE
 surf 698 pz    {z_cap_graphite}      % BOTTOM OF HOLDING PLATE
 surf 699 pz    {z_plate}             % TOP OF HOLDING PLATE
 
+%------ lower channel 1 ------
+surf 701 hexxc 0   0   {hexs}      % HEX FOR SLIT
+surf 702 hexxc 0   0   {rg}	       % HEX FOR FUEL TRANSITION
+surf 703 cyl   0   0   {r1}	       % CENTER HOLE
+surf 704 cyl   0   0   {rh}        % HASTELLOY PIPE RADIUS
+surf 705 cyl   0   0   {r2}        % OUTER FUEL CYL RADIUS
+
+%------ lower channel 2 ------
+surf 801 hexxc 0   0   {hexs}	   % HEX FOR SLIT
+surf 802 cyl   0   0   {r1}	       % CENTER HOLE
+surf 803 cyl   0   0   {rh}        % HASTELLOY PIPE RADIUS
+surf 804 cyl   0   0   {r2}        % OUTER FUEL CYL RADIUS
+surf 805 cyl   0   0   {rh2}       % OUTER HASTELLOY PIPE
+
 %------ lower plenum ------
-surf 701 hexxc 0   0   {hexs}	      % HEX FOR SLIT
-surf 702 cyl   0   0   {r1}	    % CENTER HOLE
-surf 703 cyl   0   0   {rh}   % hastelloy tube radius
-surf 704 cyl   0   0   {r2}   % outer fuel cyl radius
+surf 902 cyl   0   0   {r1}	   % CENTER HOLE
+
+%------ penetration to inlet plenum ------
+surf 1001 hexxc 0   0   {hexs}	   % HEX FOR SLIT
+surf 1002 cyl   0   0   {r2}       % OUTER FUEL CYL RADIUS
+surf 1003 cyl   0   0   {r1}	   % CENTER HOLE
+surf 1004 cyl   0   0   {rh}       % HASTELLOY PIPE RADIUS
+
+%------ penetration to outlet plenum ------
+surf 1101 hexxc 0   0   {hexs}	   % HEX FOR SLIT
+surf 1102 cyl   0   0   {r1}	   % CENTER HOLE
 
 '''
 
