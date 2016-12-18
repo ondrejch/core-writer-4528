@@ -171,6 +171,7 @@ surf 399 pz    {zcore}		     % HEIGHT OF CORE
 surf 401 cyl   0   0   {r3}          % FUEL CAP ABOVE FUEL CHANNELS
 surf 402 hexxc 0   0   {hexg}        % GRAPHITE HEX AROUND FUEL CAP
 surf 402 cyl   0   0   {r_shaft}     % CYLINDRICAL HOLDING SHAFT
+surf 403 hexxc 0   0   {hexs}	     % HEX FOR SLIT
 surf 496 pz    {zcore}		     % TOP OF FUEL IN CORE
 surf 497 pz    {z_cap_fuel}          % TOP OF INNER CAP
 surf 498 pz    {z_cap_graphite}      % TOP OF GRAPHITE IN CAP
@@ -201,7 +202,7 @@ surf 804 cyl   0   0   {r2}        % OUTER FUEL CYL RADIUS
 surf 805 cyl   0   0   {rh2}       % OUTER HASTELLOY PIPE
 
 %------ lower plenum ------
-surf 902 cyl   0   0   {r1}	   % CENTER HOLE
+surf 901 cyl   0   0   {r1}	   % CENTER HOLE
 
 %------ penetration to inlet plenum ------
 surf 1001 hexxc 0   0   {hexs}	   % HEX FOR SLIT
