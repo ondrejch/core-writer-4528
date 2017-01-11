@@ -9,7 +9,7 @@ import lattice, surfs, cells, materials
 
 def write_deck(channel_pitch = 11.500, 
     salt_fraction = 0.07,
-    slit = 0.2, r2=3.3, fsf = 0.070, 
+    slit = 0.2, r2=3.3, rs=0.9, fsf = 0.070, 
     rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, 
     name='Test deck'):
 	'''Write the actual Serpent deck
@@ -42,49 +42,22 @@ def write_deck(channel_pitch = 11.500,
 		output:		String containing the entire input deck
 	'''	
 # TODO 
-    channel_r1 = 
-    channel_r3 = 
+#    channel_r1 = 
+#    channel_r3 = 
 
 	# Read the initial values from some external source.
 	# Right now, I'm just plugging them in to test the script.
 	FSF = 	fsf
 	PITCH = pitch # cm
-	SLIT = 	slit # cm
+	SLIT = 	slit  # cm
 	
-	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
-	# Height of each plenum: inlet and outlet
-	plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
-	gt = 6*2.54 # thickness of graphite: cm
-	ht = 3*2.54 # thickness of hastelloy, placeholder
+
 	fuel_cells = int(rfuel/PITCH)
 	blan_cells = 1
-	rgref = rcore + gt
-	rhast = rgref + ht
-	
-	
-	
-	# Calculate the actual dimensions based on our parameters
-	# Have benchmarked this against existing perl script--should be right
-	#
-	# inradius: half the pitch
-	hpitch = PITCH/2.0
-	# circumradius: distance from center to corner
-	d = (hpitch - SLIT) * 2.0/math.sqrt(3)  
-	# radius (inner): central fuel channel radius
-	hexarea = 2.0 * math.sqrt(3.0) * 10**2
-	ri = math.sqrt(hexarea*FSF/(2.0*math.pi) )
+
 	# radius (outer): auxiliary fuel channel radius
-#	ro = ri / math.sqrt(6)
+    #ro = ri / math.sqrt(6)
 	ro = 1.1
-	# c: a constant that determines how far along the circumradius the channels appear
-	c = (ri + d*math.sqrt(3)/2.0) / ( d*(1.0 + math.sqrt(3)/2.0) )
-	# X and Y coordinates of ro
-	ro_x = c*d*math.sqrt(3)/2.0
-	ro_y = c*d*0.5
-	
-	
-	#print "hpitch:",hpitch,"\td: ", d, "\tri:", ri, "\tc: ", c
-	#print "rout", ro, "\tro_x", ro_x, "\tro_y", ro_y
 	
 	#--------------------------------
 	# Begin writing the input deck
@@ -124,7 +97,7 @@ Advisor: Dr. Ondrej Chvala
 	uh)		# pure hastelloy hex
 	
 	
-	surface_cards = surfs.write_surfs(PITCH, SLIT, d, ro, ro_x, ro_y, ri, r2, c, \
+	surface_cards = surfs.write_surfs(FSF, PITCH, SLIT, ro, r2, rs, c, \
 									  rfuel, rcore, rgref, rhast, \
 									  zcore, plenum_ht, refl_ht)
 	output += surface_cards
