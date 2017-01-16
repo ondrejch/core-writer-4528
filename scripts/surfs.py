@@ -181,20 +181,19 @@ ry = c*d			 # y coord of vertical channel
 ro_x = c*d*math.sqrt(3)/2.0
 ro_y = c*d*0.5
 
-
-'''# hexf: top channel hexagon
+# hexf: top channel hexagon
 hexf = math.sqrt(3)/2.0*(d*c) + rdiff
-zhexf1 = zcore + 2.0*rdiff	# top of fuel channel (salt)
+z_cap_fuel = zcore + 2.0*rdiff	# top of fuel channel (salt)
 
 # Make the "roof" as thick as the "wall" of the graphite hexagon
-zhexf2 = zhexf1 + (hexg - hexf) # top of fuel channel (graphite)
+z_cap_graphite = z_cap_fuel + (hexg - hexf) # top of fuel channel (graphite)
 
 # Top of the core: Axial reflector
-zrefltop = zhexf2 + zrefl
+z_topr_top = z_cap_graphite + zrefl
 zgreftop = zrefltop + (rgref - rcore)
 zhasttop = zgreftop + (rhast - rgref)
 
-
+'''
 # Bottom (floor) with the transition later
 # We want this to converge to another channel with concentric
 # cylinders at the lower plenum
@@ -272,9 +271,9 @@ surf 498 pz    {z_cap_graphite}      % TOP OF GRAPHITE IN CAP
 surf 499 pz    {z_shaft}             % TOP OF HOLDING SHAFT
 
 %------ top graphite reflector ------
-surf 501 cyl   0   0   {topr_r}      % TOP AXIAL GRAPHITE REFLECTOR
-surf 598 pz    {z_topr_bot}          % BOTTOM OF REFELECTOR
-surf 599 pz    {z_topr_top}          % TOP OF REFLECTOR
+surf 501 cyl   0   0   {rfuel}      % TOP AXIAL GRAPHITE REFLECTOR
+surf 598 pz    {z_cap_graphite}     % BOTTOM OF REFELECTOR
+surf 599 pz    {z_topr_top}         % TOP OF REFLECTOR
 
 %------ holding plate ------
 surf 601 cyl   0   0   {r_plate}     % TOP HOLDING PLATE
