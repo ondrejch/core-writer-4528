@@ -8,7 +8,7 @@
 import math
 
 
-def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore, rgref, rhast, zcore, pht, zrefl):
+def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
 	'''Function to write the surfaces for our MSBR Serpent model
 	Inputs:
 		pitch:  hexagonal pitch of fuel cells
@@ -137,22 +137,22 @@ surf 102 cylz 0  0 {rfuel} {botrt} {toprt}
 ''' Variables that need to be given to the function:
 	ro                    # Radius of the center hole for the centeral cell
 	r2                    # Radius of the concentric graphtie ring
+	rs                    # scaling factor for radial reflector hexagons
 	rfuel                 # Radius of the fuel lattice
 	rcore_inner           # Radius of the inner core barrel
 	rcore_outer           # Radius of the outer core barrel
+	zcore                 # height of core
 	slit                  # Width of slit 
 	pitch                 # Lattice pitch
 	fsf                   # fuel salt fraction
+	pht                   # height of each of the lower plena
+	zrefl                 # height of the axial reflector
 '''
 
 plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 
 # Height of each plenum: inlet and outlet
 plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
-gt = 6*2.54 # thickness of graphite: cm
-ht = 3*2.54 # thickness of hastelloy, placeholder
-rgref = rcore + gt
-rhast = rgref + ht
 
 # thast = hastelloy thickness (1/8 in)
 thast = 1.0/8 * 2.54							# hastelloy thickness
@@ -193,21 +193,25 @@ z_topr_top = z_cap_graphite + zrefl
 zgreftop = zrefltop + (rgref - rcore)
 zhasttop = zgreftop + (rhast - rgref)
 
-'''
+
 # Bottom (floor) with the transition later
 # We want this to converge to another channel with concentric
 # cylinders at the lower plenum
 # Graphite thickness between central channel and aux channel
 gt1 = d*c - rdiff - r1
+
 # Next layer down concentric circles with half the graphite thickness
 # thast = hastelloy thickness (1/8 in)
 thast = 1.0/8 * 2.54							# hastelloy thickness
 rh = r1 + thast									# radius of hastelloy cyl
 rg = (gt1/2.0 + r2)    				   			# radius of graphite hex
+
 # And cut off the bottom 10 inches below that
 ztrans1 = 0 - 10*2.54
+
 # Next layer down, the concentric circles w/ hastelloy
 rh2 = r2 + thast		# Outer hastelloy pipe
+
 # Cut off this layer 3 inches down
 ztrans2 = ztrans1 - 3*2.54
 
@@ -216,15 +220,9 @@ zitop = ztrans2 - pht	# z of the top of the inlet plenum
 zibot = zitop - pht		# z of the bottom of the inlet plenum
 zotop = zibot - pht		# z of top of outlet plenum
 zobot = zotop - pht		# z of bottom of outlet plenum
+
 # Then, the very bottom of the entire core
 zbot = zobot - (rhast - rgref)
-# Reflector apothem 
-rr = rs*hexg
-
-# Top reflector thickness
-botrt = zhexf2
-toprt = botrt + 10
-'''
 
 # New surface definitions
 surfaces = '''
@@ -232,6 +230,14 @@ surfaces = '''
 surf 1 cyl   0   0   {rfuel}         % CYLINDRICAL BOUNDS FOR FUEL LATTICE
 surf 2 cyl   0   0   {rcore_inner}   % CYLINDRICAL BOUNDS FOR FUEL AND REFLECTOR
 surf 3 cyl   0   0   {rcore_outer}   % CYLINDRICAL BOUNDS FOR ENTIRE CORE
+surf 4 pz    {zbot}                  % LOWER PLENUM BOUNDARY PARAMETERS (4-11)
+surf 5 pz    {zitop}
+surf 6 pz    {zibot}
+surf 7 pz    {zotop}
+surf 8 pz    {zobot}
+surf 9 pz    {zrefltop}
+surf 10 pz    {zgreftop}
+surf 11 pz    {zhasttop}
 
 %------ graphite hexagon and fuel channel cells ------	
 surf 101 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
@@ -320,7 +326,7 @@ surf 1102 cyl   0   0   {r1}	   % CENTER HOLE
 if __name__ == '__main__':
 	print "This is a module to write surfaces for the MSR core."
 	raw_input("Press Ctrl+C to quit, or enter else to test it. ")
-	print write_surfs(pitch = 11.5, slit = 0.323, d=6.267, ri = 2.2, ro = 0.9, \
+	print write_surfs(pitch = 11.5, slit = 0.323, d=6.267, r1 = 2.2, ro = 0.9, \
 					rox = 3.54, roy = 2.05, c = 0.65, \
 					rfuel = 400, rcore = 427, rgref = 450, rhast = 470, \
 					zcore = 100, pht = 10, zrefl = 35)

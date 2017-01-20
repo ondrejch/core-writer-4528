@@ -98,7 +98,7 @@ Advisor: Dr. Ondrej Chvala
 	
 	
 	surface_cards = surfs.write_surfs(FSF, PITCH, SLIT, ro, r2, rs, c, \
-									  rfuel, rcore, rgref, rhast, \
+									  rfuel, rcore_inner, rcore_outer, \
 									  zcore, plenum_ht, refl_ht)
 	output += surface_cards
 	
