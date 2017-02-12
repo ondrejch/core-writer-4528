@@ -22,7 +22,7 @@ def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
 		cells:		String containing cell cards'''
 	
 
-'''	# Unpack the universe tuple
+	# Unpack the universe tuple
 	ub, uf, uc, uup, \
 	ul1, ul2, ul3, ul4, \
 	ulp, uuc, ulc, uh 		 = universes
@@ -30,7 +30,7 @@ def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
 	latmid, lattop, latbot1, latbot2, latbot3, \
 	latbot4, latplen = lattices
 	
-	cells = \'''
+	cells = '''
 %------define cells--------------------
 
 % Universe {uf}: FUEL CELL
@@ -112,7 +112,7 @@ cell 267 {ul4} fuel -20
 cell 268 {ul4} void 11
 
 % Universe {uuc}: UPPER CONTROL
-cell 61 {uuc} graphite       -12  28 -41	% graphite cap
+cell 61 {uuc} he       -12    	28 -41	% helium gap
 cell 62 {uuc} graphite  12 -10 	28 -42	% graphite,level1
 cell 63 {uuc} graphite -12      41 -42	% graphite cap,level2
 cell 64 {uuc} blanket  -11 10 	28 -42  % slit all the way through
@@ -121,22 +121,22 @@ cell 66 {uuc} void     -28
 cell 67 {uuc} void      11 		28 -42
 
 % Universe {ulc}: LOWER CONTROL
-cell 71 {ulc} graphite -20               % Central channel
+cell 71 {ulc} he -20               % Central channel
 cell 72 {ulc} hastelloy -53  20    % Hast. pipe
-cell 73 {ulc} graphite -54  53           % outer fuel channel
+cell 73 {ulc} he -54  53           % outer fuel channel
 cell 74 {ulc} graphite -55 54      % graphite hex
 cell 75 {ulc} blanket  -11 55      % blanket reflector
 cell 79 {ulc} void  11 
 
 
 % The main universe
-cell 100 0 fill    {latmid} -{surfcore}     27 -28
-
+%cell 100 0 fill    {latmid} -{surffuel}     27 -28
+cell 100 0 fill    {latmid} -{surfgref}     27 -28
 %cell 101 0 blanket {surffuel} -{surfcore}   61 -42 
-cell 102 0 hastelloy {surfcore} -{surfgref}  61 -81
-cell 104 0 fill   {lattop} -{surffuel}      28 -42
-cell 105 0 fill   {latbot1} -{surffuel}     52 -27
-cell 106 0 fill   {latbot2} -{surffuel}     56 -52
+%cell 102 0 graphite {surfcore} -{surfgref}  61 -81
+cell 104 0 fill   {lattop} -{surfgref}      28 -42
+cell 105 0 fill   {latbot1} -{surfgref}     52 -27
+cell 106 0 fill   {latbot2} -{surfgref}     56 -52
 cell 107 0 fill   {latbot3} -{surffuel}	  	61 -56
 cell 108 0 fill   {latplen} -{surffuel}	  	62 -61
 cell 109 0 fill   {latbot4} -{surffuel}	  	63 -62
@@ -144,22 +144,21 @@ cell 110 0 fill   {latplen} -{surffuel}	  	64 -63
 cell 111 0 hastelloy       -{surfgref}		60 -64
 cell 112 0 hastelloy {surffuel} -{surfgref} 64 -61
 cell 113 0 hastelloy {surfgref} -{surfhast} 60 -81
-cell 120 0 blanket  	 	    -{surfcore} 42 -80 102
-cell 121 0 hastelloy	 	    -{surfcore} 80 -81
+cell 120 0 blanket  	 	    -{surfgref} 42 -81 %-80  -{surfcore}
+%cell 121 0 blanket 	 	    -{surfcore} 80 -81  % was top reflector
 cell 122 0 hastelloy	 	    -{surfhast} 81 -82
-cell 133 0 graphite                       -102
 
 
 
 cell 999 0 outside {surfhast} 60 -82
 cell 998 0 outside -60
 cell 997 0 outside  82
-\'''
-'''
+	'''
+
 
 
 # New cell definitions
-cells = \'''
+	'''cells = \'''
 % Universe {uf}: FUEL CELL
 cell 10 {uf} graphite -101  103 105
 cell 13 {uf} graphite  103 -104
@@ -230,7 +229,7 @@ cell 265 {ul3} void       1001
 cell 266 {ul4} hastelloy -1101 1102
 cell 267 {ul4} fuel      -1102
 cell 268 {ul4} void       1101
-'''
+	'''
 
 	cells = cells.format(**locals())
 	return cells

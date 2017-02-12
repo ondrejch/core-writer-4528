@@ -31,11 +31,36 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 		zrefl:	height of the axial reflector
 	Output:
 		surfaces:   string containing the surface cards for the MSR'''
-	
-'''	# Radial reflector scaling term
-	rs = 0.9
 		
-	# r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
+	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
+	# Height of each plenum: inlet and outlet
+	plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
+	gt = 6*2.54 # thickness of graphite: cm
+	ht = 3*2.54 # thickness of hastelloy, placeholder
+	rgref = rcore_inner + gt
+	rhast = rgref + ht
+	# Calculate the actual dimensions based on our parameters
+	# Have benchmarked this against existing perl script--should be right
+	#
+	# inradius: half the pitch
+	hpitch = pitch/2.0
+	# circumradius: distance from center to corner
+	d = (hpitch - slit) * 2.0/math.sqrt(3)  
+	# radius (inner): central fuel channel radius
+	hexarea = 2.0 * math.sqrt(3.0) * 10**2
+	r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
+	# radius (outer): auxiliary fuel channel radius
+#	ro = ri / math.sqrt(6)
+	ro = 1.1
+	# c: a constant that determines how far along the circumradius the channels appear
+	c = (r1 + d*math.sqrt(3)/2.0) / ( d*(1.0 + math.sqrt(3)/2.0) )
+	# X and Y coordinates of ro
+	rox = c*d*math.sqrt(3)/2.0
+	roy = c*d*0.5
+	
+	# Radial reflector scaling term
+	rs = 0.9
+ # r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
 	r2 = math.sqrt(2*r1**2 + 2*r1*thast + thast**2) # outer fuel cylinder
 	# Radius of outer fuel ring with equal volume to inner fuel channel
@@ -54,7 +79,7 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 	zhexf2 = zhexf1 + (hexg - hexf) # top of fuel channel (graphite)
 	# Top of the core: Axial reflector
 	zrefltop = zhexf2 + zrefl
-	zgreftop = zrefltop + (rgref - rcore)
+	zgreftop = zrefltop + (rgref - rcore_inner)
 	zhasttop = zgreftop + (rhast - rgref)
 
 
@@ -83,32 +108,29 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 	# Then, the very bottom of the entire core
 	zbot = zobot - (rhast - rgref)
 
-	# Reflector apothem 
+    # radial reflector 
+	rs = 0.9 
 	rr = rs*hexg
-	
-	# Top reflector thickness
-	botrt = zhexf2
-	toprt = botrt + 10
-'''
 
-'''	surfaces = \'''
+
+	surfaces = '''
 %------define the hexagon and fuel channel cells----
 surf 10 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
 surf 11 hexxc 0   0   {hexs}	      % HEX FOR SLIT
-surf 12 hexxc 0   0   {hexf}          % HEX FOR FUEL used in channel cap
-surf 20 cyl   0   0   {ri}	    % CENTER HOLE
+surf 12 hexxc 0   0   {hexf}          % HEX FOR FUEL
+surf 20 cyl   0   0   {r1}	    % CENTER HOLE
 surf 21 cyl   0   0   {r2}     % INTERMEDIATE GRAPHITE RING
 surf 22 cyl   0   0   {r3}     % OUTER FUEL RING
 surf 27 pz    0			    % BOTTOM OF CORE
 surf 28 pz    {zcore}		     % HEIGHT OF CORE
-surf 30 cyl   0   0   {rfuel}   % CYLINDRICAL BOUNDS FOR FUEL LATTICE
-surf 31 cyl   0   0   {rcore}   % CYLINDRICAL BOUNDS FOR FUEL AND BLANKET
-surf 32 cyl   0   0   {rgref}   % CYLINDRICAL BOUNDS FOR GRAPHITE + PREVIOUS 2
-surf 33 cyl   0   0   {rhast}   % ENTIRE CORE CYLIDNRICAL BOUNDS
-surf 41 pz    {zhexf1}          % BOTTOM OF GRAPHITE CAP
-surf 42 pz    {zhexf2}          % TOP OF GRAPHITE CAP
-surf 51 cone  0 0 0 {hexg}  -{hexg}  % NOT USED
-surf 52 pz    {ztrans1}       % BOTTOM OF A LATTICE
+surf 30 cyl   0   0   {rfuel}
+surf 31 cyl   0   0   {rcore_inner}
+surf 32 cyl   0   0   {rgref}
+surf 33 cyl   0   0   {rhast}
+surf 41 pz    {zhexf1}
+surf 42 pz    {zhexf2}
+surf 51 cone  0 0 0 {hexg}  -{hexg}
+surf 52 pz    {ztrans1}
 surf 53 cyl   0   0   {rh}   % hastelloy tube radius
 surf 54 cyl   0   0   {r2}   % outer fuel cyl radius
 surf 55 hexxc 0   0   {rg}	% Hex for fuel transition
@@ -128,13 +150,12 @@ surf 92 cyl   {rox}  {roy}  {ro}
 surf 93 cyl  -{rox}  {roy}  {ro}
 surf 94 cyl  -{rox} -{roy}  {ro}
 surf 95 cyl   {rox} -{roy}  {ro}
-surf 101 hexxc 0   0   {rr}	     % HEX FOR RADIAL GRAPHITE REFLECTOR
-surf 102 cylz 0  0 {rfuel} {botrt} {toprt}
-\'''
+surf 101 hexxc 0      0   {rr}      % HEX FOR RADIAL REFLECTOR
 '''
 
+
 # New calculations for surface definitions commented sections are a work in progress
-''' Variables that need to be given to the function:
+	''' Variables that need to be given to the function:
 	ro                    # Radius of the center hole for the centeral cell
 	r2                    # Radius of the concentric graphtie ring
 	rs                    # scaling factor for radial reflector hexagons
@@ -147,9 +168,9 @@ surf 102 cylz 0  0 {rfuel} {botrt} {toprt}
 	fsf                   # fuel salt fraction
 	pht                   # height of each of the lower plena
 	zrefl                 # height of the axial reflector
-'''
+	'''
 
-plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
+	'''plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 
 # Height of each plenum: inlet and outlet
 plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
@@ -225,7 +246,7 @@ zobot = zotop - pht		# z of bottom of outlet plenum
 zbot = zobot - (rhast - rgref)
 
 # New surface definitions
-surfaces = '''
+surfaces = \'''
 %------ main universe ------
 surf 1 cyl   0   0   {rfuel}         % CYLINDRICAL BOUNDS FOR FUEL LATTICE
 surf 2 cyl   0   0   {rcore_inner}   % CYLINDRICAL BOUNDS FOR FUEL AND REFLECTOR
@@ -313,7 +334,7 @@ surf 1004 cyl   0   0   {rh}       % HASTELLOY PIPE RADIUS
 surf 1101 hexxc 0   0   {hexs}	   % HEX FOR SLIT
 surf 1102 cyl   0   0   {r1}	   % CENTER HOLE
 
-'''
+	'''
 
 
 

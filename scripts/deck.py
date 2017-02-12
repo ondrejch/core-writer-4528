@@ -7,11 +7,11 @@ import math #HOW DARE SOMEONE USE MATH AND NOT NUMPY.
 import lattice, surfs, cells, materials
 
 
-def write_deck(channel_pitch = 11.500, 
-    salt_fraction = 0.07,
-    slit = 0.2, r2=3.3, rs=0.9, fsf = 0.070, 
-    rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, 
-    name='Test deck'):
+def write_deck(fsf = 0.07, \
+    pitch = 11.500, \
+    slit = 0.2, r2 = 3.3, rs = 0.9, \
+    rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, \
+    name = 'Test deck'):
 	'''Write the actual Serpent deck
 	Inputs:
 * channel_pitch:  hexagonal pitch of fuel cells [cm]
@@ -58,7 +58,6 @@ def write_deck(channel_pitch = 11.500,
 	# radius (outer): auxiliary fuel channel radius
     #ro = ri / math.sqrt(6)
 	ro = 1.1
-	
 	#--------------------------------
 	# Begin writing the input deck
 	
@@ -70,7 +69,7 @@ Core Design Team: Dallas Moser, Igor Gussev
 Reprocessing: Devon Drey
 Advisor: Dr. Ondrej Chvala
 */\n
-'''
+	'''
 	
 		
 	LATS = range(33,33+7)
@@ -96,8 +95,20 @@ Advisor: Dr. Ondrej Chvala
 	ulc,	# lower	control
 	uh)		# pure hastelloy hex
 	
+	rcore_inner = 200
+	rcore_outer = 215
+	rfuel = 150
+	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
+	# Height of each plenum: inlet and outlet
+	plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
+	gt = 6*2.54 # thickness of graphite: cm
+	ht = 3*2.54 # thickness of hastelloy, placeholder
+	fuel_cells = int(rfuel/PITCH)
+	blan_cells = 1
+	rgref = rcore + gt
+	rhast = rgref + ht
 	
-	surface_cards = surfs.write_surfs(FSF, PITCH, SLIT, ro, r2, rs, c, \
+	surface_cards = surfs.write_surfs(FSF, PITCH, SLIT, ro, r2, rs, \
 									  rfuel, rcore_inner, rcore_outer, \
 									  zcore, plenum_ht, refl_ht)
 	output += surface_cards
@@ -106,19 +117,19 @@ Advisor: Dr. Ondrej Chvala
 	output += cell_cards
 	
 	# Create the middle/active core
-	lattice_cards = lattice.write_lattice(LATS[0], ub, uf, uc, fuel_cells, blan_cells, PITCH)
+	lattice_cards = lattice.write_lattice(rfuel, PITCH, rcore_inner, LATS[0], ub, uf, uc, fuel_cells, blan_cells)
 	# Create the upper plenum
-	lattice_cards += lattice.write_lattice(LATS[1], ub, uup, uuc, fuel_cells, blan_cells, PITCH)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[1], ub, uup, uuc, fuel_cells, blan_cells)
 	# Create the lower level -1
-	lattice_cards += lattice.write_lattice(LATS[2], ub, ul1, ulc, fuel_cells, blan_cells, PITCH)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[2], ub, ul1, ulc, fuel_cells, blan_cells)
 	# Create the lower level -2
-	lattice_cards += lattice.write_lattice(LATS[3], ub, ul2, ulc, fuel_cells, blan_cells, PITCH)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[3], ub, ul2, ulc, fuel_cells, blan_cells)
 	# Create the lower level -3: penetration to inlet plenum
-	lattice_cards += lattice.write_lattice(LATS[4], uh, ul3, uh,  fuel_cells, blan_cells, PITCH)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[4], uh, ul3, uh,  fuel_cells, blan_cells)
 	# Create the lower level -4: penetration to the outlet plenum
-	lattice_cards += lattice.write_lattice(LATS[5], uh, ul4, uh,  fuel_cells, blan_cells, PITCH)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[5], uh, ul4, uh,  fuel_cells, blan_cells)
 	# Create the lower fuel plena (identical for both)
-	lattice_cards += lattice.write_lattice(LATS[6], uh, ulp, ulp, fuel_cells, blan_cells, PITCH)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[6], uh, ulp, ulp, fuel_cells, blan_cells)
 	output += lattice_cards
 	
 	mat_cards = materials.write_materials('09c')
@@ -139,7 +150,7 @@ set pop 2000 500 20
 set acelib "sss_endfb7u.xsdata"
 set nfylib "sss_endfb7.nfy"
 set declib "sss_endfb7.dec"
-'''
+	'''
 	output += data_cards
 	
 	
@@ -148,7 +159,7 @@ set declib "sss_endfb7.dec"
 plot 1 1500 1580 0  -300 300  -80 560
 plot 2 1500 1500 0  -300 300  -80 560
 plot 3 1500 1500 29 %[250 -100 100 -100 100]
-'''
+	'''
 	output += plot_cards
 	
 	output = output.format(**locals())
@@ -158,5 +169,5 @@ plot 3 1500 1500 29 %[250 -100 100 -100 100]
 
 if __name__ == '__main__':
 	print("This is the Serpent deck writing function for the MSR project.")
-	input("Press Ctrl+C to exit, or Enter to test it. ")
+	raw_input("Press Ctrl+C to exit, or Enter to test it. ")
 	print(write_deck())

@@ -27,13 +27,13 @@ nperjob = 2 #num nodes per job
 ncpu = 8 #cpu per job
 queue = 'gen5'
 
-#now the qsub text is constructed.
+'''#now the qsub text is constructed.
 qtext=[]
 with open(qsubtemplate, 'r') as temp:
     text=temp.read()
     for line in text:
        qtext.append(line.format(**locals())) 
-
+'''
 # From .108 cm to .327 cm
 # 73 different slit widths are attempted.
 slits = np.linspace(0.108, 0.327, 73)
