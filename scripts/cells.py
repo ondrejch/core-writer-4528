@@ -42,7 +42,13 @@ cell 12 {uf} void  11
 cell  7 {uf} fuel -20 
 cell  1 {uf} fuel 21 -22 
 
+% Universe 7: Blank Blanket Cell
+cell 701 7 blanket -200
+cell 702 7 blanket 200
 
+% Universe 8: Holding Shafts
+cell 801 8 hastelloy -202
+cell 802 8 blanket  202
 
 % Universe {ub}: BLANKET CELL
 cell 15 {ub} graphite -101 %27 -28
@@ -72,9 +78,9 @@ cell  39 {uc} he -95
 
 
 % Universe {uup}: UPPER CHANNEL
-cell 43 {uup} fuel     -12    	28 -41	% fuel cap
-cell 44 {uup} graphite  12 -10 	28 -42	% graphite,level1
-cell 45 {uup} graphite -12      41 -42	% graphite cap,level2
+cell 43 {uup} fuel     -22    	28 -41	% fuel cap
+cell 44 {uup} graphite  22 -10 	28 -41	% graphite,level1
+cell 45 {uup} graphite -10      41 -42	% graphite cap,level2
 cell 46 {uup} blanket  -11 10 	28 -42  % slit all the way through
 cell 47 {uup} void      42
 cell 48 {uup} void     -28
@@ -137,17 +143,20 @@ cell 100 0 fill    {latmid} -{surfgref}     27 -28
 cell 104 0 fill   {lattop} -{surfgref}      28 -42
 cell 105 0 fill   {latbot1} -{surfgref}     52 -27
 cell 106 0 fill   {latbot2} -{surfgref}     56 -52
-cell 107 0 fill   {latbot3} -{surffuel}	  	61 -56
+cell 107 0 fill   {latbot3} -{surfgref}	  	61 -56
 cell 108 0 fill   {latplen} -{surffuel}	  	62 -61
 cell 109 0 fill   {latbot4} -{surffuel}	  	63 -62
 cell 110 0 fill   {latplen} -{surffuel}	  	64 -63
 cell 111 0 hastelloy       -{surfgref}		60 -64
 cell 112 0 hastelloy {surffuel} -{surfgref} 64 -61
 cell 113 0 hastelloy {surfgref} -{surfhast} 60 -81
-cell 120 0 blanket  	 	    -{surfgref} 42 -81 %-80  -{surfcore}
+%cell 120 0 blanket  	 	    -{surfgref} 42 -81 102 %-80  -{surfcore}
 %cell 121 0 blanket 	 	    -{surfcore} 80 -81  % was top reflector
 cell 122 0 hastelloy	 	    -{surfhast} 81 -82
-
+cell 123 0 graphite   -102 % top graphite reflector
+cell 124 0 hastelloy -201 % top holding plate
+cell 125 0 fill 40 -{surfgref} 203 -204
+cell 126 0 blanket -205 204 -81
 
 
 cell 999 0 outside {surfhast} 60 -82

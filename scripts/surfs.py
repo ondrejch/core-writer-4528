@@ -31,7 +31,7 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 		zrefl:	height of the axial reflector
 	Output:
 		surfaces:   string containing the surface cards for the MSR'''
-		
+	dgr = 15	
 	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 	# Height of each plenum: inlet and outlet
 	plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
@@ -48,7 +48,8 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 	d = (hpitch - slit) * 2.0/math.sqrt(3)  
 	# radius (inner): central fuel channel radius
 	hexarea = 2.0 * math.sqrt(3.0) * 10**2
-	r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
+	#r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
+	r1 = 2.06
 	# radius (outer): auxiliary fuel channel radius
 #	ro = ri / math.sqrt(6)
 	ro = 1.1
@@ -62,14 +63,16 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 	rs = 0.9
  # r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
-	r2 = math.sqrt(2*r1**2 + 2*r1*thast + thast**2) # outer fuel cylinder
+	#r2 = math.sqrt(2*r1**2 + 2*r1*thast + thast**2) # outer fuel cylinder
+	r2 = r1 + 1.127
 	# Radius of outer fuel ring with equal volume to inner fuel channel
 	r3 = math.sqrt(r1**2 + r2**2)
 	rdiff = (r3 - r2)
 	# Establish a few additional dimensions
 	hexs = pitch/2.0    # radius of cell, outside slit
 	#ry = c*d
-	hexg = hexs - slit   # radius of graphite, inside slit
+	#hexg = hexs - slit   # radius of graphite, inside slit
+	hexg = 6.83
 	ry = c*d			# y coord of vertical channel
 
 	# hexf: top channel hexagon
@@ -111,11 +114,13 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
     # radial reflector 
 	rs = 0.9 
 	rr = rs*hexg
-
+	axial_top = zhexf2+dgr
+	zplate = axial_top + 15
+	zshaft = zplate + 30
 
 	surfaces = '''
 %------define the hexagon and fuel channel cells----
-surf 10 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
+surf 10 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE 6.82625cm for def
 surf 11 hexxc 0   0   {hexs}	      % HEX FOR SLIT
 surf 12 hexxc 0   0   {hexf}          % HEX FOR FUEL
 surf 20 cyl   0   0   {r1}	    % CENTER HOLE
@@ -151,6 +156,13 @@ surf 93 cyl  -{rox}  {roy}  {ro}
 surf 94 cyl  -{rox} -{roy}  {ro}
 surf 95 cyl   {rox} -{roy}  {ro}
 surf 101 hexxc 0      0   {rr}      % HEX FOR RADIAL REFLECTOR
+surf 102 cylz 0 0 {rgref} {zhexf2} {axial_top} % top axial reflector from top of the upper channel
+surf 200 hexxc 0 0 {hexg}
+surf 201 cyl 0 0 {rgref} {axial_top} {zplate} % top holding plate
+surf 202 cyl 0 0 {r1}     % holding shaft
+surf 203 pz {zplate}   % top of holding plate
+surf 204 pz {zshaft}   % top of holding shafts
+surf 205 cyl 0 0 {rgref} % blanket above core
 '''
 
 

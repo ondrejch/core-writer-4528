@@ -11,12 +11,12 @@ import numpy as np
 
 # Parameters from the MCNP optimization
 FSF = 0.07
-PITCH = 11.500
-R2 = 3.3
+PITCH = 14
+R2 = 2.56
 #SLIT = 0.323
-RFUEL = 150
-RCORE = 215
-ZCORE = 400
+RFUEL = 152.4
+RCORE = 213.36
+ZCORE = 404
 ZREFL = 100
 
 

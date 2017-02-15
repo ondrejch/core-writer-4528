@@ -79,6 +79,8 @@ Advisor: Dr. Ondrej Chvala
 	ul1, ul2, ul3, ul4 = range(25,29)
 	ulp = 10
 	uh  = 11
+	ubb = 7 # blank blanket universe
+	uhs = 8 # holding shafts
 	
 	# Tuple of all the universe numbers
 	UNIVERSES = (
@@ -121,15 +123,17 @@ Advisor: Dr. Ondrej Chvala
 	# Create the upper plenum
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[1], ub, uup, uuc, fuel_cells, blan_cells)
 	# Create the lower level -1
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[2], ub, ul1, ulc, fuel_cells, blan_cells)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[2], ubb, ul1, ulc, fuel_cells, blan_cells)
 	# Create the lower level -2
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[3], ub, ul2, ulc, fuel_cells, blan_cells)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[3], ubb, ul2, ulc, fuel_cells, blan_cells)
 	# Create the lower level -3: penetration to inlet plenum
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[4], uh, ul3, uh,  fuel_cells, blan_cells)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[4], ubb, ul3, uh,  fuel_cells, blan_cells)
 	# Create the lower level -4: penetration to the outlet plenum
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[5], uh, ul4, uh,  fuel_cells, blan_cells)
 	# Create the lower fuel plena (identical for both)
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[6], uh, ulp, ulp, fuel_cells, blan_cells)
+	# Create the holding shafts
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,40, ubb, uhs, uhs, fuel_cells, blan_cells)
 	output += lattice_cards
 	
 	mat_cards = materials.write_materials('09c')
@@ -156,9 +160,9 @@ set declib "sss_endfb7.dec"
 	
 	plot_cards = '''
 % PLOTS
-plot 1 1500 1580 0  -300 300  -80 560
-plot 2 1500 1500 0  -300 300  -80 560
-plot 3 1500 1500 29 %[250 -100 100 -100 100]
+plot 1 3000 3000 0  -300 300  -80 560
+plot 2 3000 3000 0  -300 300  -80 560
+plot 3 3000 3000 29 %[250 -100 100 -100 100]
 	'''
 	output += plot_cards
 	

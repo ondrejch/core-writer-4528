@@ -54,7 +54,7 @@ therm graph gre7.08t
 %  HELIUM: gas due to alpha particles
 %  DENSITY: 54.19 E-6 g/cc
 mat he -54.19E-6 tmp 973
-rgb 0 255 16
+rgb 255 0 0
 2004.{lib} 1
 
 % CONTROL ROD: NATURAL BORON at 900K
