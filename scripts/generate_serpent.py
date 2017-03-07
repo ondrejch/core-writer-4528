@@ -10,10 +10,11 @@ import os
 import numpy as np
 
 # Parameters from the MCNP optimization
-FSF = 0.07
-PITCH = 14
-R2 = 2.56
-#SLIT = 0.323
+FSF = .165
+PITCH = 14 # l * 2 from the lattice optimization script
+R2 = 5.8
+SLIT = 0.323  # TODO: Calculate from relba (only important to center cell)
+RELBA = 0.8
 RFUEL = 152.4
 RCORE = 213.36
 ZCORE = 404
@@ -40,11 +41,11 @@ slits = np.linspace(0.108, 0.327, 73)
 
 for s in slits:
 
-    title = "SMTFMSBR: slit = " + str(s)
+    title = "MSiBR: slit = " + str(s)
 
 
     # Make the deck
-    serp_deck = deck.write_deck(fsf = FSF, pitch = PITCH, slit = s,
+    serp_deck = deck.write_deck(fsf = FSF, relba = RELBA, pitch = PITCH, slit = s,
                             rfuel = RFUEL, rcore = RCORE, r2 = R2, zcore = ZCORE, refl_ht = ZREFL,
                             name = title)
     

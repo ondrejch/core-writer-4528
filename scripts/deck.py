@@ -7,7 +7,7 @@ import math #HOW DARE SOMEONE USE MATH AND NOT NUMPY.
 import lattice, surfs, cells, materials
 
 
-def write_deck(fsf = 0.07, \
+def write_deck(fsf = 0.07, relba = 0.08,\
     pitch = 11.500, \
     slit = 0.2, r2 = 3.3, rs = 0.9, \
     rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, \
@@ -50,6 +50,7 @@ def write_deck(fsf = 0.07, \
 	FSF = 	fsf
 	PITCH = pitch # cm
 	SLIT = 	slit  # cm
+	RELBA = relba
 	
 
 	fuel_cells = int(rfuel/PITCH)
@@ -64,7 +65,7 @@ def write_deck(fsf = 0.07, \
 	output = '''\
 set title "{name}"
 /*This is a  model of the:
-Small Modular Thorium Fueled Molten Salt Breeder Reactor
+Molten Salt iso-Breeder Reactor
 Core Design Team: Dallas Moser, Igor Gussev
 Reprocessing: Devon Drey
 Advisor: Dr. Ondrej Chvala
@@ -80,7 +81,10 @@ Advisor: Dr. Ondrej Chvala
 	ulp = 10
 	uh  = 11
 	ubb = 7 # blank blanket universe
-	uhs = 8 # holding shafts
+	uhsu = 8 # holding shafts upper
+	uhsl = 9 # holding shafts lower
+	uhp  = 12 # holding plate
+	
 	
 	# Tuple of all the universe numbers
 	UNIVERSES = (
@@ -110,7 +114,7 @@ Advisor: Dr. Ondrej Chvala
 	rgref = rcore + gt
 	rhast = rgref + ht
 	
-	surface_cards = surfs.write_surfs(FSF, PITCH, SLIT, ro, r2, rs, \
+	surface_cards = surfs.write_surfs(FSF, RELBA, PITCH, SLIT, ro, r2, rs, \
 									  rfuel, rcore_inner, rcore_outer, \
 									  zcore, plenum_ht, refl_ht)
 	output += surface_cards
@@ -132,8 +136,12 @@ Advisor: Dr. Ondrej Chvala
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[5], uh, ul4, uh,  fuel_cells, blan_cells)
 	# Create the lower fuel plena (identical for both)
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[6], uh, ulp, ulp, fuel_cells, blan_cells)
-	# Create the holding shafts
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,40, ubb, uhs, uhs, fuel_cells, blan_cells)
+	# Create the upper holding shafts
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,40, ubb, uhsu, uhsu, fuel_cells, blan_cells)
+	# Create lower holding shafts
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,41, ubb, uhsl, uhsl, fuel_cells, blan_cells)
+	# Create holding plate
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,42, 11, uhp, uhp, fuel_cells, blan_cells)
 	output += lattice_cards
 	
 	mat_cards = materials.write_materials('09c')

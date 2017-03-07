@@ -46,9 +46,17 @@ cell  1 {uf} fuel 21 -22
 cell 701 7 blanket -200
 cell 702 7 blanket 200
 
-% Universe 8: Holding Shafts
-cell 801 8 hastelloy -202
+% Universe 8: Holding Shafts on top of plate
+cell 801 8 graphite -202
 cell 802 8 blanket  202
+
+% Universe 9: Holding Shafts under plate
+cell 901 9 graphite -206
+cell 902 9 blanket 206
+
+% Universe 12: Holding Plate
+cell 1201 12 graphite -207
+cell 1202 12 hastelloy 207
 
 % Universe {ub}: BLANKET CELL
 cell 15 {ub} graphite -101 %27 -28
@@ -72,6 +80,9 @@ cell  36 {uc} he -92
 cell  37 {uc} he -93 
 cell  38 {uc} he -94 
 cell  39 {uc} he -95 
+
+
+
 
 
 % Universe {uup}: UPPER CHANNEL
@@ -109,7 +120,6 @@ cell 262 {ul3} fuel -20          % Central channel
 cell 263 {ul3} hastelloy -53  20 % Inner pipe
 cell 264 {ul3} fuel -54  53      % outer fuel channel
 cell 265 {ul3} void 11
-
 % Universe {ul4}: PENETRATION TO OUTLET PLENUM
 cell 266 {ul4} hastelloy -11 20
 cell 267 {ul4} fuel -20
@@ -151,9 +161,9 @@ cell 113 0 hastelloy {surfgref} -{surfhast} 60 -81
 %cell 120 0 blanket  	 	    -{surfgref} 42 -81 102 %-80  -{surfcore}
 %cell 121 0 blanket 	 	    -{surfcore} 80 -81  % was top reflector
 cell 122 0 hastelloy	 	    -{surfhast} 81 -82
-%cell 123 0 graphite   -102 % top graphite reflector % modify this - universe blanket hexagosn, larger stem r3*1.1
-cell 124 0 hastelloy -201 % top holding plate        % needs universe: has hexagons with graphite cylinders  r3
-cell 125 0 fill 40 -{surfgref} 203 -204              % graphite cyl continues up.                            r3
+cell 123 0 fill 41 -{surfgref} 208 -209% top graphite reflector
+cell 124 0 fill 42 -{surfgref} 209 -203 % top holding plate
+cell 125 0 fill 40 -{surfgref} 203 -204
 cell 126 0 blanket -205 204 -81
 
 
@@ -164,7 +174,7 @@ cell 997 0 outside  82
 
 
 
-# New cell definitions
+# New cell definitions - WARNING!!! THESE ARE NOT USED IN THE CURRENT VERSION
 	'''cells = \'''
 % Universe {uf}: FUEL CELL
 cell 10 {uf} graphite -101  103 105

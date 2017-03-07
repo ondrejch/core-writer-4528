@@ -8,7 +8,7 @@
 import math
 
 
-def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
+def write_surfs(fsf, relba, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
 	'''Function to write the surfaces for our MSBR Serpent model
 	Inputs:
 		pitch:  hexagonal pitch of fuel cells
@@ -31,6 +31,7 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 		zrefl:	height of the axial reflector
 	Output:
 		surfaces:   string containing the surface cards for the MSR'''
+	l=pitch/2.0
 	dgr = 15	
 	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 	# Height of each plenum: inlet and outlet
@@ -47,9 +48,9 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 	# circumradius: distance from center to corner
 	d = (hpitch - slit) * 2.0/math.sqrt(3)  
 	# radius (inner): central fuel channel radius
-	hexarea = 2.0 * math.sqrt(3.0) * 10**2
-	#r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
-	r1 = 2.06
+	hexarea = 2.0 * math.sqrt(3.0) * l**2
+	r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
+	#r1 = 2.06
 	# radius (outer): auxiliary fuel channel radius
 #	ro = ri / math.sqrt(6)
 	ro = 1.1
@@ -64,15 +65,19 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
  # r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
 	#r2 = math.sqrt(2*r1**2 + 2*r1*thast + thast**2) # outer fuel cylinder
-	r2 = r1 + 1.127
+	#r2 = r1 + 1.127
 	# Radius of outer fuel ring with equal volume to inner fuel channel
 	r3 = math.sqrt(r1**2 + r2**2)
 	rdiff = (r3 - r2)
 	# Establish a few additional dimensions
-	hexs = pitch/2.0    # radius of cell, outside slit
+	hexs = l   # radius of cell, outside slit
 	#ry = c*d
-	#hexg = hexs - slit   # radius of graphite, inside slit
-	hexg = 6.83
+	blanketfraction = 1.06923
+	blanketA0 = blanketfraction * r1**2 *math.pi
+	blanketarea = blanketA0 * relba
+	l2 = math.sqrt( l**2 - blanketarea / (2.0 * math.sqrt(3.0)))
+	hexg = l2   # radius of graphite, inside slit
+	#hexg = 6.83
 	ry = c*d			# y coord of vertical channel
 
 	# hexf: top channel hexagon
@@ -113,10 +118,12 @@ def write_surfs(fsf, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, z
 
     # radial reflector 
 	rs = 0.9 
-	rr = rs*hexg
-	axial_top = zhexf2+dgr
-	zplate = axial_top + 15
-	zshaft = zplate + 30
+	rr = rs*hexg  # reflector size
+	hsl = r3*1.1  # holding shaft lower radius
+	hsu = r3      # holding shaft upper radius
+	axial_top = zhexf2+30.48
+	zplate = axial_top + 12
+	zshaft = zplate + 5
 
 	surfaces = '''
 %------define the hexagon and fuel channel cells----
@@ -159,14 +166,19 @@ surf 101 hexxc 0      0   {rr}      % HEX FOR RADIAL REFLECTOR
 surf 102 cylz 0 0 {rgref} {zhexf2} {axial_top} % top axial reflector from top of the upper channel
 surf 200 hexxc 0 0 {hexg}
 surf 201 cyl 0 0 {rgref} {axial_top} {zplate} % top holding plate
-surf 202 cyl 0 0 {r1}     % holding shaft
+surf 202 cyl 0 0 {r3}     % holding shaft
 surf 203 pz {zplate}   % top of holding plate
 surf 204 pz {zshaft}   % top of holding shafts
 surf 205 cyl 0 0 {rgref} % blanket above core
+surf 206 cyl 0 0 {hsl}
+surf 207 cylz 0 0 {hsu}
+surf 208 pz {zhexf2}
+surf 209 pz {axial_top}
 '''
 
 
 # New calculations for surface definitions commented sections are a work in progress
+# WARNING!!! THESE ARE NOT USED IN THE CURRENT VERSION
 	''' Variables that need to be given to the function:
 	ro                    # Radius of the center hole for the centeral cell
 	r2                    # Radius of the concentric graphtie ring
