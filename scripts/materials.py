@@ -3,14 +3,31 @@
 # Materials: Writes the material cards for the Serpent input deck.
 
 
-def write_materials(lib='09c'):
-    '''Function to write material cards for Serpent input deck.
+def write_materials(temp):
+	'''Function to write material cards for Serpent input deck.
 Inputs: 
+	temp: core temperature
     lib:    String containing the neutron cross section library to use.
+    scat_lib : thermal scattering library
 Outputs:
     mats:    String containing the material cards'''
+	temp += 273 # convert C to K to more easily use libraries
+	# set neutron cross section library 
+	if temp >= 600 and temp < 900: lib = '06c'
+	if temp >= 900 and temp < 1200: lib = '09c' 
     
-    mats = '''
+	# set thermal scattering libraries
+	if temp == 800: scat_lib = 'gre7.18t'
+	if temp > 800 and temp < 1000: scat_lib = 'gre7.18t gre7.20t'
+	if temp == 1000: scat_lib = 'gre7.20t'
+	if temp > 1000 and temp < 1200: scat_lib = 'gre7.20t gre7.22t'
+    
+	# change density of major components to match temperature (reference DMSR project) 973K nominal
+	fuel_dens = 2.03434 - (temp - 973)*1*10**(-3)
+	blanket_dens = 4.43711 - (temp - 973)*1*10**(-3)
+	gr_dens = 1.82/((1. + (temp - 973)*4.14*10**(-6))**3)
+	
+	mats = '''
 %-------material definition--------------
 %NOTE: VOLUMES OR MASS OF EACH MAY NEED TO 
 %BE CALCULATED FOR BURNUP CALCULATIONS
@@ -20,7 +37,7 @@ Outputs:
 %  MELT TEMP: 450C or 742.15K
 %  MATERIAL INFO FROM ONRL-4528 TALBE 3.1.
 %  MAY NEED VOLUME OR MASS FOR BURNUP CALCULATIONS
-mat fuel -2.03434  tmp 973
+mat fuel -{fuel_dens}  tmp {temp}
 rgb 130 32 144
 3006.{lib}   -0.000725     %  Li6
 3007.{lib}  -14.495960     %  Li7
@@ -34,7 +51,7 @@ rgb 130 32 144
 %  MELT TEMP: 560C or 833.15K
 %  MATERIAL INFO FROM ONRL-4528 TALBE 3.1.
 %  MAY NEED VOLUME OR MASS FOR BURNUP CALCULATIONS
-mat blanket -4.43711 tmp 973
+mat blanket -{blanket_dens} tmp {temp}
 rgb 0 157 254 
 3006.{lib}   -0.000243     %  Li6
 3007.{lib}   -4.855845     %  Li7
@@ -45,15 +62,15 @@ rgb 0 157 254
 
 %  NUCLEAR GRAPHITE: Natural concentration of carbon
 %  DENSITY: 1.82 G/CC
-mat graphite -1.82 moder graph 6000 tmp 973
+mat graphite -{gr_dens} moder graph 6000 tmp {temp}
 rgb 130 130 130
 6000.{lib} 1
 %  THERMAL SCATTERING LIBRARY FOR GRAPHITE
-therm graph gre7.08t
+therm graph {temp} {scat_lib}
 
 %  HELIUM: gas due to alpha particles
 %  DENSITY: 54.19 E-6 g/cc
-mat he -54.19E-6 tmp 973
+mat he -54.19E-6 tmp {temp}
 rgb 255 0 0
 2004.{lib} 1
 
@@ -61,13 +78,13 @@ rgb 255 0 0
 % DENSITY: 2.3 g/cc
 % MELT TEMP: 2076C or 2349.15K
 % 19.9 B10 and 80.1 B11
-mat absorber -2.3 tmp 973
+mat absorber -2.3 tmp {temp}
 rgb 74 74 74
 5010.{lib} -0.199
 5011.{lib} -0.801
 
 %  TODO: Hastelloy
-mat hastelloy -8.86 tmp 973
+mat hastelloy -8.86 tmp {temp}
 rgb 139 69 19
 28058.{lib}  -0.472120   %  Ni
  28060.{lib}  -0.181860   %  Ni
@@ -100,9 +117,9 @@ rgb 139 69 19
  29063.{lib}  -0.002421   %  Cu
  29065.{lib}  -0.001079   %  Cu
 '''
-    mats = mats.format(**locals())
+	mats = mats.format(**locals())
 
-    return mats
+	return mats
 
 
 if __name__ == '__main__':

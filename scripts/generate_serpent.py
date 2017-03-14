@@ -10,16 +10,16 @@ import os
 import numpy as np
 
 # Parameters from the MCNP optimization
-FSF = .165
-PITCH = 14 # l * 2 from the lattice optimization script
-R2 = 5.8
+FSF = .165 # fuel salt fraction
+PITCH =  14 # l * 2 from the lattice optimization script
+R2 = 5.8 #4
 SLIT = 0.323  # TODO: Calculate from relba (only important to center cell)
-RELBA = 0.8
-RFUEL = 152.4
-RCORE = 213.36
+RELBA = 0.8 # relative blanket fraction (same as in lattice analysis)
+RFUEL = 152.4 # radius of fuel portion of the core
+RCORE = 213.36 # outer radius of core vessel
 ZCORE = 404
 ZREFL = 100
-
+TEMP = 600 # temp in C nominal 700C
 
 #Job submission settings:
 FILENAME = "msbr.inp"
@@ -45,7 +45,7 @@ for s in slits:
 
 
     # Make the deck
-    serp_deck = deck.write_deck(fsf = FSF, relba = RELBA, pitch = PITCH, slit = s,
+    serp_deck = deck.write_deck(fsf = FSF, relba = RELBA, pitch = PITCH, slit = s, temp=TEMP,
                             rfuel = RFUEL, rcore = RCORE, r2 = R2, zcore = ZCORE, refl_ht = ZREFL,
                             name = title)
     

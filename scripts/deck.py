@@ -9,7 +9,7 @@ import lattice, surfs, cells, materials
 
 def write_deck(fsf = 0.07, relba = 0.08,\
     pitch = 11.500, \
-    slit = 0.2, r2 = 3.3, rs = 0.9, \
+    slit = 0.2, temp=700, r2 = 3.3, rs = 0.9, \
     rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, \
     name = 'Test deck'):
 	'''Write the actual Serpent deck
@@ -51,7 +51,7 @@ def write_deck(fsf = 0.07, relba = 0.08,\
 	PITCH = pitch # cm
 	SLIT = 	slit  # cm
 	RELBA = relba
-	
+	TEMP = temp
 
 	fuel_cells = int(rfuel/PITCH)
 	blan_cells = 1
@@ -101,8 +101,8 @@ Advisor: Dr. Ondrej Chvala
 	ulc,	# lower	control
 	uh)		# pure hastelloy hex
 	
-	rcore_inner = 200
-	rcore_outer = 215
+	rcore_inner = rcore - 2*2.54
+	rcore_outer = rcore
 	rfuel = 150
 	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 	# Height of each plenum: inlet and outlet
@@ -114,7 +114,7 @@ Advisor: Dr. Ondrej Chvala
 	rgref = rcore + gt
 	rhast = rgref + ht
 	
-	surface_cards = surfs.write_surfs(FSF, RELBA, PITCH, SLIT, ro, r2, rs, \
+	surface_cards = surfs.write_surfs(FSF, RELBA, PITCH, SLIT, TEMP, ro, r2, rs, \
 									  rfuel, rcore_inner, rcore_outer, \
 									  zcore, plenum_ht, refl_ht)
 	output += surface_cards
@@ -144,7 +144,7 @@ Advisor: Dr. Ondrej Chvala
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,42, 11, uhp, uhp, fuel_cells, blan_cells)
 	output += lattice_cards
 	
-	mat_cards = materials.write_materials('09c')
+	mat_cards = materials.write_materials(TEMP)
 	output += mat_cards
 	
 	

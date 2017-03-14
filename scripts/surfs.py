@@ -8,7 +8,7 @@
 import math
 
 
-def write_surfs(fsf, relba, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
+def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
 	'''Function to write the surfaces for our MSBR Serpent model
 	Inputs:
 		pitch:  hexagonal pitch of fuel cells
@@ -29,15 +29,17 @@ def write_surfs(fsf, relba, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_o
 		pht:	height of each of the lower plena
 		zcore:	height of the core
 		zrefl:	height of the axial reflector
+		gr_exp: graphite expansion coefficient m/m K
 	Output:
 		surfaces:   string containing the surface cards for the MSR'''
+	gr_exp = 4.14*10**(-6)
 	l=pitch/2.0
 	dgr = 15	
 	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 	# Height of each plenum: inlet and outlet
 	plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
 	gt = 6*2.54 # thickness of graphite: cm
-	ht = 3*2.54 # thickness of hastelloy, placeholder
+	ht = 2*2.54 # thickness of hastelloy, placeholder
 	rgref = rcore_inner + gt
 	rhast = rgref + ht
 	# Calculate the actual dimensions based on our parameters
@@ -76,7 +78,7 @@ def write_surfs(fsf, relba, pitch, slit, ro, r2, rs, rfuel, rcore_inner, rcore_o
 	blanketA0 = blanketfraction * r1**2 *math.pi
 	blanketarea = blanketA0 * relba
 	l2 = math.sqrt( l**2 - blanketarea / (2.0 * math.sqrt(3.0)))
-	hexg = l2   # radius of graphite, inside slit
+	hexg = l2  + (temp - 700)*gr_exp*l2 # radius of graphite, inside slit with thermal expansion 700C nominal temp
 	#hexg = 6.83
 	ry = c*d			# y coord of vertical channel
 
