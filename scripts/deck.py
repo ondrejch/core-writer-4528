@@ -3,7 +3,7 @@
 # Deck.py
 # A script that generates the Serpent input deck for our SMTF-MSBR
 	
-import math #HOW DARE SOMEONE USE MATH AND NOT NUMPY. 
+import math 
 import lattice, surfs, cells, materials
 
 
@@ -41,9 +41,6 @@ def write_deck(fsf = 0.07, relba = 0.08,\
 	Outputs:
 		output:		String containing the entire input deck
 	'''	
-# TODO 
-#    channel_r1 = 
-#    channel_r3 = 
 
 	# Read the initial values from some external source.
 	# Right now, I'm just plugging them in to test the script.
@@ -119,29 +116,30 @@ Advisor: Dr. Ondrej Chvala
 									  zcore, plenum_ht, refl_ht)
 	output += surface_cards
 	
-	cell_cards = cells.write_cells(UNIVERSES, LATS, 30, 31, 32, 33)
+	cell_cards = cells.write_cells(UNIVERSES, LATS, 18, 31, 19, 20)
 	output += cell_cards
 	
 	# Create the middle/active core
 	lattice_cards = lattice.write_lattice(rfuel, PITCH, rcore_inner, LATS[0], ub, uf, uc, fuel_cells, blan_cells)
 	# Create the upper plenum
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[1], ub, uup, uuc, fuel_cells, blan_cells)
-	# Create the lower level -1
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[2], ubb, ul1, ulc, fuel_cells, blan_cells)
+	# Create the lower level -1 	
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[2], ub, ul1, ulc, fuel_cells, blan_cells)
 	# Create the lower level -2
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[3], ubb, ul2, ulc, fuel_cells, blan_cells)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[3], ub, ul2, ulc, fuel_cells, blan_cells)
 	# Create the lower level -3: penetration to inlet plenum
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[4], ubb, ul3, uh,  fuel_cells, blan_cells)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[4], ub, ul3, uh,  fuel_cells, blan_cells)
 	# Create the lower level -4: penetration to the outlet plenum
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[5], uh, ul4, uh,  fuel_cells, blan_cells)
 	# Create the lower fuel plena (identical for both)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,43, uh, 1111, ulp, fuel_cells, blan_cells)
 	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,LATS[6], uh, ulp, ulp, fuel_cells, blan_cells)
 	# Create the upper holding shafts
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,40, ubb, uhsu, uhsu, fuel_cells, blan_cells)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,40, uhsu, uhsu, uhsu, fuel_cells, blan_cells)
 	# Create lower holding shafts
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,41, ubb, uhsl, uhsl, fuel_cells, blan_cells)
-	# Create holding plate
-	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,42, 11, uhp, uhp, fuel_cells, blan_cells)
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,41, uhsl, uhsl, uhsl, fuel_cells, blan_cells)
+	# Create holding plate - first uhp was 11
+	lattice_cards += lattice.write_lattice(rfuel, PITCH, rcore_inner,42, uhp, uhp, uhp, fuel_cells, blan_cells)
 	output += lattice_cards
 	
 	mat_cards = materials.write_materials(TEMP)

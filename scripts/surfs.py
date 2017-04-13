@@ -102,11 +102,12 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
 	# thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
 	rh = r1 + thast									# radius of hastelloy cyl
-	rg = (gt1/2.0 + r2)    				   			# radius of graphite hex
+	r3_bot = math.sqrt(r1**2 + rh**2)               # outer fuel radius in lower plenum
+	rg = (gt1/2.0 + r3_bot)    				   			# radius of graphite hex
 	# And cut off the bottom 10 inches below that
 	ztrans1 = 0 - 10*2.54
 	# Next layer down, the concentric circles w/ hastelloy
-	rh2 = r2 + thast		# Outer hastelloy pipe
+	rh2 = r3_bot + thast		# Outer hastelloy pipe
 	# Cut off this layer 3 inches down
 	ztrans2 = ztrans1 - 3*2.54
 
@@ -121,13 +122,19 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
     # radial reflector 
 	rs = 0.9 
 	rr = rs*hexg  # reflector size
-	hsl = r3*1.1  # holding shaft lower radius
-	hsu = r3      # holding shaft upper radius
+	hsl = 3.97  # holding shaft lower radius
+	hsu = hsl*0.8     # holding shaft upper radius
 	axial_top = zhexf2+30.48
 	zplate = axial_top + 12
-	zshaft = zplate + 5
-
-	surfaces = '''
+	zshaft = zplate + 5 
+	
+	# lower plenum cone calculations: naming scheme goes outward from center
+	conez1 = ((0-ztrans1)/(r2-rh))*r2      
+	conez2 = ((0-ztrans1)/(r3-r3_bot))*r3
+	conez3 = ((0-ztrans1)/(hexg-rh2))*hexs
+	
+	# Old definitions, currently not in use
+	'''surfaces = \'''
 %------define the hexagon and fuel channel cells----
 surf 10 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE 6.82625cm for def
 surf 11 hexxc 0   0   {hexs}	      % HEX FOR SLIT
@@ -168,7 +175,7 @@ surf 101 hexxc 0      0   {rr}      % HEX FOR RADIAL REFLECTOR
 surf 102 cylz 0 0 {rgref} {zhexf2} {axial_top} % top axial reflector from top of the upper channel
 surf 200 hexxc 0 0 {hexg}
 surf 201 cyl 0 0 {rgref} {axial_top} {zplate} % top holding plate
-surf 202 cyl 0 0 {r3}     % holding shaft
+surf 202 cyl 0 0 {hsu}     % holding shaft
 surf 203 pz {zplate}   % top of holding plate
 surf 204 pz {zshaft}   % top of holding shafts
 surf 205 cyl 0 0 {rgref} % blanket above core
@@ -176,11 +183,14 @@ surf 206 cyl 0 0 {hsl}
 surf 207 cylz 0 0 {hsu}
 surf 208 pz {zhexf2}
 surf 209 pz {axial_top}
+surf 2501 cyl 0  0 {r3_bot} % outer fuel radius for lower plenum
+surf 3501 cone 0 0 0 {r2} -{conez1}
+surf 3502 cone 0 0 0 {r3} -{conez2}
+surf 3503 cone 0 0 0 {hexg} -{conez3}
 '''
 
 
-# New calculations for surface definitions commented sections are a work in progress
-# WARNING!!! THESE ARE NOT USED IN THE CURRENT VERSION
+# New calculations for surface definitions: comment block below is not up to date
 	''' Variables that need to be given to the function:
 	ro                    # Radius of the center hole for the centeral cell
 	r2                    # Radius of the concentric graphtie ring
@@ -196,169 +206,145 @@ surf 209 pz {axial_top}
 	zrefl                 # height of the axial reflector
 	'''
 
-	'''plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 
-# Height of each plenum: inlet and outlet
-plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
-
-# thast = hastelloy thickness (1/8 in)
-thast = 1.0/8 * 2.54							# hastelloy thickness
-
-# radius (inner): central fuel channel radius
-hexarea = 2.0 * math.sqrt(3.0) * 10**2
-r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
-
-# Radius of outer fuel ring with equal volume to inner fuel channel
-r3 = math.sqrt(r1**2 + r2**2)
-rdiff = (r3 - r2)
-
-# Establish a few additional dimensions
-hexs = pitch/2.0     # radius of cell, outside slit
-
-# circumradius: distance from center to corner
-d = (pitch/2.0 - slit) * 2.0/math.sqrt(3)
-
-# c: a constant that determines how far along the circumradius the channels appear
-c = (ri + d*math.sqrt(3)/2.0) / ( d*(1.0 + math.sqrt(3)/2.0) )
-
-hexg = hexs - slit   # radius of graphite, inside slit
-ry = c*d			 # y coord of vertical channel
-
-# X and Y coordinates of control rods
-ro_x = c*d*math.sqrt(3)/2.0
-ro_y = c*d*0.5
-
-# hexf: top channel hexagon
-hexf = math.sqrt(3)/2.0*(d*c) + rdiff
-z_cap_fuel = zcore + 2.0*rdiff	# top of fuel channel (salt)
-
-# Make the "roof" as thick as the "wall" of the graphite hexagon
-z_cap_graphite = z_cap_fuel + (hexg - hexf) # top of fuel channel (graphite)
-
-# Top of the core: Axial reflector
-z_topr_top = z_cap_graphite + zrefl
-zgreftop = zrefltop + (rgref - rcore)
-zhasttop = zgreftop + (rhast - rgref)
-
-
-# Bottom (floor) with the transition later
-# We want this to converge to another channel with concentric
-# cylinders at the lower plenum
-# Graphite thickness between central channel and aux channel
-gt1 = d*c - rdiff - r1
-
-# Next layer down concentric circles with half the graphite thickness
-# thast = hastelloy thickness (1/8 in)
-thast = 1.0/8 * 2.54							# hastelloy thickness
-rh = r1 + thast									# radius of hastelloy cyl
-rg = (gt1/2.0 + r2)    				   			# radius of graphite hex
-
-# And cut off the bottom 10 inches below that
-ztrans1 = 0 - 10*2.54
-
-# Next layer down, the concentric circles w/ hastelloy
-rh2 = r2 + thast		# Outer hastelloy pipe
-
-# Cut off this layer 3 inches down
-ztrans2 = ztrans1 - 3*2.54
-
-# Then, the lower plena
-zitop = ztrans2 - pht	# z of the top of the inlet plenum
-zibot = zitop - pht		# z of the bottom of the inlet plenum
-zotop = zibot - pht		# z of top of outlet plenum
-zobot = zotop - pht		# z of bottom of outlet plenum
-
-# Then, the very bottom of the entire core
-zbot = zobot - (rhast - rgref)
 
 # New surface definitions
-surfaces = \'''
+	surfaces = '''
 %------ main universe ------
-surf 1 cyl   0   0   {rfuel}         % CYLINDRICAL BOUNDS FOR FUEL LATTICE
-surf 2 cyl   0   0   {rcore_inner}   % CYLINDRICAL BOUNDS FOR FUEL AND REFLECTOR
-surf 3 cyl   0   0   {rcore_outer}   % CYLINDRICAL BOUNDS FOR ENTIRE CORE
-surf 4 pz    {zbot}                  % LOWER PLENUM BOUNDARY PARAMETERS (4-11)
+%% vertical core plane divisions
+
+surf 16 pz    {zhasttop}
+surf 15 pz    {zgreftop}
+surf 14 pz {zshaft}   % top of holding shafts
+surf 13 pz {zplate}   % top of holding plate
+surf 12 pz {axial_top}
+surf 11 pz {zhexf2}
+surf 10 pz    {zhexf2}
+surf 9 pz    {zcore}		     % HEIGHT OF CORE
+surf 8 pz    0			    % BOTTOM OF CORE
+surf 7 pz    {ztrans1}
+surf 6 pz    {ztrans2}
 surf 5 pz    {zitop}
-surf 6 pz    {zibot}
-surf 7 pz    {zotop}
-surf 8 pz    {zobot}
-surf 9 pz    {zrefltop}
-surf 10 pz    {zgreftop}
-surf 11 pz    {zhasttop}
+surf 4 pz    {zibot}
+surf 3 pz    {zotop}
+surf 2 pz    {zobot}
+surf 1 pz    {zbot}
 
-%------ graphite hexagon and fuel channel cells ------	
-surf 101 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
-surf 102 hexxc 0   0   {hexs}	     % HEX FOR SLIT
-surf 103 cyl   0   0   {r1}	         % CENTER HOLE
-surf 104 cyl   0   0   {r2}          % INTERMEDIATE GRAPHITE RING
-surf 105 cyl   0   0   {r3}          % OUTER FUEL RING
-surf 198 pz    0		             % BOTTOM OF CORE
-surf 199 pz    {zcore}		         % HEIGHT OF CORE
+%% radial bounds
+surf 17 cyl 0 0 {rgref} % blanket above core
+surf 18 cyl   0   0   {rfuel}
+surf 19 cyl   0   0   {rgref}
+surf 20 cyl   0   0   {rhast}
 
-%------ graphite hexagon and control rod channels ------
+
+%------ blanket cell Universe 1 ------
+surf 101 hexxc 0   0   {rr}          % HEX FOR REFLECTOR GRAPHITE
+
+
+%------ graphite hexagon and fuel channel cells Universe 2 ------	
 surf 201 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
 surf 202 hexxc 0   0   {hexs}	     % HEX FOR SLIT
-surf 203 cyl   0   0   {r1}  	     % CENTER HOLE
-surf 204 cyl   0   {ry}   {ro}	     % OUTER HOLES x 6 CONTROL RODS
-surf 205 cyl   0  -{ry}   {ro}       %           ||
-surf 206 cyl   {rox}  {roy}  {ro}    %           ||
-surf 207 cyl  -{rox}  {roy}  {ro}    %          _||_
-surf 208 cyl  -{rox} -{roy}  {ro}    %          \  /
-surf 209 cyl   {rox} -{roy}  {ro}    % __________\/____________
-surf 298 pz    0		             % BOTTOM OF CORE
-surf 299 pz    {zcore}		         % HEIGHT OF CORE
+surf 203 cyl   0   0   {r1}	         % CENTER HOLE
+surf 204 cyl   0   0   {r2}          % INTERMEDIATE GRAPHITE RING
+surf 205 cyl   0   0   {r3}          % OUTER FUEL RING
 
-%------ graphite hexagon for radial graphite reflector ------
-surf 301 hexxc 0   0   {rs*hex}      % HEX FOR REFLECTOR GRAPHITE
-surf 398 pz    0	                 % BOTTOM OF CORE
-surf 399 pz    {zcore}		         % HEIGHT OF CORE
 
-%------ fuel channel cap and holding shaft ------
-surf 401 cyl   0   0   {r3}          % FUEL CAP ABOVE FUEL CHANNELS
-surf 402 hexxc 0   0   {hexg}        % GRAPHITE HEX AROUND FUEL CAP
-surf 402 cyl   0   0   {r_shaft}     % CYLINDRICAL HOLDING SHAFT
-surf 403 hexxc 0   0   {hexs}	     % HEX FOR SLIT
-surf 496 pz    {zcore}		         % TOP OF FUEL IN CORE
-surf 497 pz    {z_cap_fuel}          % TOP OF INNER CAP
-surf 498 pz    {z_cap_graphite}      % TOP OF GRAPHITE IN CAP
-surf 499 pz    {z_shaft}             % TOP OF HOLDING SHAFT
+%------ graphite hexagon and control rod channels Universe 3 ------
+surf 301 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
+surf 302 hexxc 0   0   {hexs}	     % HEX FOR SLIT
+surf 303 cyl   0   0   {r1}  	     % CENTER HOLE
+surf 304 cyl   0   {ry}   {ro}	     % OUTER HOLES x 6 CONTROL RODS
+surf 305 cyl   0  -{ry}   {ro}       %           ||
+surf 306 cyl   {rox}  {roy}  {ro}    %           ||
+surf 307 cyl  -{rox}  {roy}  {ro}    %          _||_
+surf 308 cyl  -{rox} -{roy}  {ro}    %          \  /
+surf 309 cyl   {rox} -{roy}  {ro}    % __________\/____________
 
-%------ top graphite reflector ------
-surf 501 cyl   0   0   {rfuel}      % TOP AXIAL GRAPHITE REFLECTOR
-surf 598 pz    {z_cap_graphite}     % BOTTOM OF REFELECTOR
-surf 599 pz    {z_topr_top}         % TOP OF REFLECTOR
 
-%------ holding plate ------
-surf 601 cyl   0   0   {r_plate}     % TOP HOLDING PLATE
-surf 698 pz    {z_cap_graphite}      % BOTTOM OF HOLDING PLATE
-surf 699 pz    {z_plate}             % TOP OF HOLDING PLATE
+%------ upper channel Universe 4 ------
+surf 401 hexxc 0   0   {hexg}	      % HEX FOR GRAPHITE
+surf 402 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 403 cyl   0   0   {r3}           % OUTER FUEL RING
+surf 404 pz    {zcore}		          % HEIGHT OF CORE
+surf 405 pz    {zhexf1}
+surf 406 pz    {zhexf2}
 
-%------ lower channel 1 ------
-surf 701 hexxc 0   0   {hexs}      % HEX FOR SLIT
-surf 702 hexxc 0   0   {rg}	       % HEX FOR FUEL TRANSITION
-surf 703 cyl   0   0   {r1}	       % CENTER HOLE
-surf 704 cyl   0   0   {rh}        % HASTELLOY PIPE RADIUS
-surf 705 cyl   0   0   {r2}        % OUTER FUEL CYL RADIUS
 
-%------ lower channel 2 ------
-surf 801 hexxc 0   0   {hexs}	   % HEX FOR SLIT
-surf 802 cyl   0   0   {r1}	       % CENTER HOLE
-surf 803 cyl   0   0   {rh}        % HASTELLOY PIPE RADIUS
-surf 804 cyl   0   0   {r2}        % OUTER FUEL CYL RADIUS
-surf 805 cyl   0   0   {rh2}       % OUTER HASTELLOY PIPE
+%------ upper control Universe 5 ------
+surf 501 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
+surf 502 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 503 hexxc 0   0   {hexf}          % HEX FOR FUEL
+surf 504 pz    {zcore}		     % HEIGHT OF CORE
+surf 505 pz    {zhexf1}
+surf 506 pz    {zhexf2}
 
-%------ lower plenum ------
-surf 901 cyl   0   0   {r1}	   % CENTER HOLE
 
-%------ penetration to inlet plenum ------
-surf 1001 hexxc 0   0   {hexs}	   % HEX FOR SLIT
-surf 1002 cyl   0   0   {r2}       % OUTER FUEL CYL RADIUS
-surf 1003 cyl   0   0   {r1}	   % CENTER HOLE
-surf 1004 cyl   0   0   {rh}       % HASTELLOY PIPE RADIUS
+%------ lower control Universe 6 ------
+surf 601 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 602 cyl   0   0   {r1}	    % CENTER HOLE
+surf 603 cyl   0   0   {rh}   % hastelloy tube radius
+surf 604 cyl 0  0 {r3_bot} % outer fuel radius for lower plenum
+surf 605 hexxc 0   0   {rg}	% Hex for fuel transition
 
-%------ penetration to outlet plenum ------
-surf 1101 hexxc 0   0   {hexs}	   % HEX FOR SLIT
-surf 1102 cyl   0   0   {r1}	   % CENTER HOLE
+
+%------ blank blanket cell Universe 7 ------
+surf 701 hexxc 0 0 {hexg}
+
+
+%------ holding shafts on top of plate Universe 8 ------
+surf 801 cyl 0 0 {hsu}     % holding shaft
+
+
+%------ holding shafts under plate Universe 9 ------
+surf 901 cyl 0 0 {hsl}
+
+
+%------ hastelloy hex Universe 11 ------
+surf 1101 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+
+
+%------ lower plenum bottom Universe 10 ------
+surf 1001 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+
+
+%------ holding plate Universe 12 ------
+surf 1201 cylz 0 0 {hsu}
+
+
+%------ lower channel 1 Universe 25 ------
+surf 2501 hexxc 0   0   {hexs}      % HEX FOR SLIT
+surf 2502 cyl   0   0   {r1}	       % CENTER HOLE
+surf 2503 cyl   0   0   {rh}        % HASTELLOY PIPE RADIUS
+surf 2504 cyl   0   0   {r2}        % OUTER FUEL CYL RADIUS
+surf 2505 cone 0 0 0 {r2} -{conez1}
+surf 2506 cone 0 0 0 {r3} -{conez2}
+surf 2507 cone 0 0 0 {hexg} -{conez3}
+
+
+%------ lower channel 2 Universe 26------
+surf 2601 hexxc 0   0   {hexs}	   % HEX FOR SLIT
+surf 2602 cyl   0   0   {r1}	   % CENTER HOLE
+surf 2603 cyl   0   0   {rh}       % HASTELLOY PIPE RADIUS
+surf 2604 cyl   0   0   {r3_bot}   % outer fuel radius for lower plenum
+surf 2605 cyl   0   0   {rh2}      % OUTER HASTELLOY PIPE
+
+
+%------ penetration to inlet plenum Universe 27 ------
+surf 2701 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 2702 cyl   0   0   {r1}	    % CENTER HOLE
+surf 2703 cyl 0  0 {r3_bot} % outer fuel radius for lower plenum
+surf 2704 cyl   0   0   {rh}   % hastelloy tube radius
+
+
+%------ penetration to outlet plenum Universe 28 ------
+surf 2801 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 2802 cyl   0   0   {r1}	    % CENTER HOLE
+
+
+%------ lower plenum top Universe 1111 ------
+surf 111101 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 111102 cyl   0   0   {r1}	    % CENTER HOLE
+surf 111103 cyl   0   0   {rh}   % hastelloy tube radius
 
 	'''
 

@@ -30,10 +30,10 @@ def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
 	latmid, lattop, latbot1, latbot2, latbot3, \
 	latbot4, latplen = lattices
 	
-	cells = '''
+	'''cells = \'''
 %------define cells--------------------
 
-% Universe {uf}: FUEL CELL
+% Universe {uf}: FUEL CELL U2
 cell 10 {uf} graphite -10 20 22
 cell 13 {uf} graphite 20 -21
 cell 11 {uf} blanket  -11 10 
@@ -95,30 +95,37 @@ cell 48 {uup} void     -28
 cell 49 {uup} void      11 		28 -42
 
 % Universe {ul1}: LOWER CHANNEL 1
-cell 51 {ul1} blanket -11 55 
+cell 51 {ul1} blanket -11 3503 
 cell 52 {ul1} fuel -20    % -27 56  % Central channel
 cell 53 {ul1} hastelloy -53  20 % -27 56  % Hast. pipe
-cell 54 {ul1} fuel -54  53 % -27 56  % outer fuel channel
-cell 55 {ul1} graphite -55 54 % 52 % graphite hex
+cell 58 {ul1} graphite -3501 53
+cell 54 {ul1} fuel -3502  3501%53 % 2501  % outer fuel channel
+cell 55 {ul1} graphite -3503 3502 % 3501 was 55 2501 % graphite hex
 cell 59 {ul1} void 11
 
 % Universe {ul2}: LOWER CHANNEL 2
 cell 251 {ul2} blanket -11 57 
 cell 252 {ul2} fuel -20    % -27 56  % Central channel
 cell 253 {ul2} hastelloy -53  20 % -27 56  % Hast. pipe
-cell 254 {ul2} fuel -54  53 % -27 56  % outer fuel channel
-cell 257 {ul2} hastelloy -57 54 % -27 56 % outer pipe
+cell 254 {ul2} fuel -2501  53 % -27 56  % outer fuel channel
+cell 257 {ul2} hastelloy -57 2501 % -27 56 % outer pipe
 cell 259 {ul2} void 11
 
-% Universe {ulp}: LOWER PLENUM
+% Universe 1111: LOWER PLENUM TOP 
+cell 2611 1111 fuel -11 53
+cell 2621 1111 fuel -20          % Central channel
+cell 2631 1111 hastelloy -53  20 % Inner pipe
+cell 2651 1111 void 11
+
+% Universe {ulp}: LOWER PLENUM BOTTOM
 cell 250 {ulp} fuel -11
 cell 260 {ulp} void  11
 
 % Universe {ul3}: PENENETRATION TO INLET PLENUM
-cell 261 {ul3} hastelloy -11 54
+cell 261 {ul3} hastelloy -11 2501
 cell 262 {ul3} fuel -20          % Central channel
 cell 263 {ul3} hastelloy -53  20 % Inner pipe
-cell 264 {ul3} fuel -54  53      % outer fuel channel
+cell 264 {ul3} fuel -2501  53      % outer fuel channel
 cell 265 {ul3} void 11
 % Universe {ul4}: PENETRATION TO OUTLET PLENUM
 cell 266 {ul4} hastelloy -11 20
@@ -135,10 +142,10 @@ cell 66 {uuc} void     -28
 cell 67 {uuc} void      11 		28 -42
 
 % Universe {ulc}: LOWER CONTROL
-cell 71 {ulc} he -20               % Central channel
-cell 72 {ulc} hastelloy -53  20    % Hast. pipe
-cell 73 {ulc} he -54  53           % outer fuel channel
-cell 74 {ulc} graphite -55 54      % graphite hex
+cell 71 {ulc} graphite -20               % Central channel - was he
+cell 72 {ulc} graphite -53  20    % Hast. pipe - was hastelelloy
+cell 73 {ulc} graphite -2501  53           % outer fuel channel - was he
+cell 74 {ulc} graphite -55 2501      % graphite hex
 cell 75 {ulc} blanket  -11 55      % blanket reflector
 cell 79 {ulc} void  11 
 
@@ -152,7 +159,7 @@ cell 104 0 fill   {lattop} -{surfgref}      28 -42
 cell 105 0 fill   {latbot1} -{surfgref}     52 -27
 cell 106 0 fill   {latbot2} -{surfgref}     56 -52
 cell 107 0 fill   {latbot3} -{surfgref}	  	61 -56
-cell 108 0 fill   {latplen} -{surffuel}	  	62 -61
+cell 108 0 fill   43 -{surffuel}	  	62 -61
 cell 109 0 fill   {latbot4} -{surffuel}	  	63 -62
 cell 110 0 fill   {latplen} -{surffuel}	  	64 -63
 cell 111 0 hastelloy       -{surfgref}		60 -64
@@ -175,77 +182,156 @@ cell 997 0 outside  82
 
 
 # New cell definitions - WARNING!!! THESE ARE NOT USED IN THE CURRENT VERSION
-	'''cells = \'''
-% Universe {uf}: FUEL CELL
-cell 10 {uf} graphite -101  103 105
-cell 13 {uf} graphite  103 -104
-cell 11 {uf} blanket  -102  101 
-cell 12 {uf} void      102 
-cell  7 {uf} fuel     -103 
-cell  1 {uf} fuel      104 -105 
+	cells = '''
+%------define cells--------------------
+% Universe {ub}: BLANKET CELL U1
+cell 15 {ub} graphite   -101
+cell 16 {ub} blanket     101 
 
-% Universe {ub}: BLANKET CELL
-cell 15 {ub} graphite -301 
-cell 16 {ub} blanket   301 
+	
+% Universe {uf}: FUEL CELL U2
+cell 10 {uf} graphite -201 203 205
+cell 13 {uf} graphite 203 -204
+cell 11 {uf} blanket  -202 201  
+cell 12 {uf} void  202 
+cell  7 {uf} fuel -203 
+cell  1 {uf} fuel 204 -205 
 
-% Universe {uh}: HASTELLOY HEX
-cell 18 {uh} hastelloy -102
-cell 19 {uh} void       102
 
-% Universe {uc}: CONTROL ROD 
-cell 30 {uc} graphite -201 203 204 205 206 207 208 209
-cell 41 {uc} blanket  -202 201 
-cell 401 {uc} blanket -203
-cell 42 {uc} void      202
-%cell 38 {uc} void    -298
-%cell 39 {uc} void     299
-cell  34 {uc} he      -204 
-cell  35 {uc} he      -205 
-cell  36 {uc} he      -206
-cell  37 {uc} he      -207 
-cell  38 {uc} he      -208 
-cell  39 {uc} he      -209 
+% Universe {uc}: CONTROL ROD U3 
+% Similar to fuel cell, but with helium in channels
+cell 30 {uc} graphite -301 303 304 305 306 307 308 309  
+cell 41 {uc} blanket  -302 301 
+cell 401 {uc} blanket -303 
+cell 42 {uc} void   302 
+cell  34 {uc} he -304 
+cell  35 {uc} he -305 
+cell  36 {uc} he -306 
+cell  37 {uc} he -307 
+cell  38 {uc} he -308 
+cell  39 {uc} he -309 
 
-% Universe {uup}: UPPER CHANNEL !! holding shaft not included !!
-cell 43 {uup} fuel     -401  496 -497       % fuel cap
-cell 44 {uup} graphite  401 -402  496 -497	% graphite,level1
-cell 45 {uup} graphite -402  497 -498       % graphite cap,level2
-cell 46 {uup} blanket  -403  402  496  498  % slit all the way through
-cell 47 {uup} void      498
-cell 48 {uup} void     -496
-cell 49 {uup} void      403  496 -498
 
-% Universe {ul1}: LOWER CHANNEL 1
-cell 51 {ul1} blanket   -701 702
-cell 52 {ul1} fuel      -703     % Central channel
-cell 53 {ul1} hastelloy -704 703 % Hast. pipe
-cell 54 {ul1} fuel      -705 704 % outer fuel channel
-cell 55 {ul1} graphite  -702 705 % graphite hex
-cell 59 {ul1} void       701
+% Universe {uup}: UPPER CHANNEL U4
+cell 43 {uup} fuel     -403  404 -405	    % fuel cap
+cell 44 {uup} graphite  403 -401  404 -405	% graphite,level1
+cell 45 {uup} graphite -401  405 -406	    % graphite cap,level2
+cell 46 {uup} blanket  -402  401  404 -406  % slit all the way through
+cell 47 {uup} void      406
+cell 48 {uup} void     -404
+cell 49 {uup} void      402  404 -406
 
-% Universe {ul2}: LOWER CHANNEL 2
-cell 251 {ul2} blanket   -801 805
-cell 252 {ul2} fuel      -802     % Central channel
-cell 253 {ul2} hastelloy -803 802 % Hast. pipe
-cell 254 {ul2} fuel      -804 803 % outer fuel channel
-cell 257 {ul2} hastelloy -805 804 % outer pipe
-cell 259 {ul2} void       801
 
-% Universe {ulp}: LOWER PLENUM
-cell 250 {ulp} fuel -901
-cell 260 {ulp} void  901
+% Universe {uuc}: UPPER CONTROL U5
+cell 61 {uuc} he       -503  504 -505	    % helium gap
+cell 62 {uuc} graphite  503 -501  504 -506	% graphite,level1
+cell 63 {uuc} graphite -503  505 -506	    % graphite cap,level2
+cell 64 {uuc} blanket  -502  501  504 -506  % slit all the way through
+cell 65 {uuc} void      506
+cell 66 {uuc} void     -504
+cell 67 {uuc} void      502  504 -506
 
-% Universe {ul3}: PENENETRATION TO INLET PLENUM
-cell 261 {ul3} hastelloy -1001 1002
-cell 262 {ul3} fuel      -1003        % Central channel
-cell 263 {ul3} hastelloy -1004 1003 % Inner pipe
-cell 264 {ul3} fuel      -1004 1002  % outer fuel channel
-cell 265 {ul3} void       1001
 
-% Universe {ul4}: PENETRATION TO OUTLET PLENUM
-cell 266 {ul4} hastelloy -1101 1102
-cell 267 {ul4} fuel      -1102
-cell 268 {ul4} void       1101
+% Universe {ulc}: LOWER CONTROL U6
+cell 71 {ulc} graphite -602       % Central channel - was he
+cell 72 {ulc} graphite -603  602  % Hast. pipe - was hastelelloy
+cell 73 {ulc} graphite -604  603  % outer fuel channel - was he
+cell 74 {ulc} graphite -605  604  % graphite hex
+cell 75 {ulc} blanket  -601  605  % blanket reflector
+cell 79 {ulc} void      601 
+
+
+% Universe 7: Blank Blanket Cell U7
+cell 701 7 blanket -701
+cell 702 7 blanket 701
+
+
+% Universe 8: Holding Shafts on top of plate U8
+cell 801 8 graphite -801
+cell 802 8 blanket  801
+
+
+% Universe 9: Holding Shafts under plate U9
+cell 901 9 graphite -901
+cell 902 9 blanket 901
+
+
+% Universe {ulp}: LOWER PLENUM BOTTOM U10
+cell 250 {ulp} fuel -1001
+cell 260 {ulp} void  1001
+
+
+% Universe {uh}: HASTELLOY HEX U11
+cell 18 {uh} hastelloy -1101
+cell 19 {uh} void       1101
+
+
+% Universe 12: Holding Plate U12
+cell 1201 12 graphite -1201
+cell 1202 12 hastelloy 1201
+
+% Universe {ul1}: LOWER CHANNEL 1 U25
+cell 51 {ul1} blanket   -2501  2507 
+cell 52 {ul1} fuel      -2502        % Central channel
+cell 53 {ul1} hastelloy -2503  2502  % Hast. pipe
+cell 58 {ul1} graphite  -2505  2503
+cell 54 {ul1} fuel      -2506  2505  % outer fuel channel
+cell 55 {ul1} graphite  -2507  2506  % graphite hex
+cell 59 {ul1} void       2501
+
+% Universe {ul2}: LOWER CHANNEL 2  U26
+cell 251 {ul2} blanket   -2601  2605 
+cell 252 {ul2} fuel      -2602        % Central channel
+cell 253 {ul2} hastelloy -2603  2602  % Hast. pipe
+cell 254 {ul2} fuel      -2604  2603  % outer fuel channel
+cell 257 {ul2} hastelloy -2605  2604  % outer pipe
+cell 259 {ul2} void       2601
+
+
+
+% Universe {ul3}: PENENETRATION TO INLET PLENUM U27
+cell 261 {ul3} hastelloy -2701  2703
+cell 262 {ul3} fuel      -2702        % Central channel
+cell 263 {ul3} hastelloy -2704  2702  % Inner pipe
+cell 264 {ul3} fuel      -2703  2704  % outer fuel channel
+cell 265 {ul3} void       2701
+
+
+% Universe {ul4}: PENETRATION TO OUTLET PLENUM U28
+cell 266 {ul4} hastelloy -2801  2802
+cell 267 {ul4} fuel      -2802
+cell 268 {ul4} void       2801
+
+
+% Universe 1111: LOWER PLENUM TOP U1111
+cell 2611 1111 fuel      -111101  111103
+cell 2621 1111 fuel      -111102          % Central channel
+cell 2631 1111 hastelloy -111103  111102  % Inner pipe
+cell 2651 1111 void       111101
+
+
+% The main universe
+cell 100 0 fill       {latmid}   -{surfgref} 8 -9
+cell 104 0 fill       {lattop}   -{surfgref} 9 -10
+cell 105 0 fill       {latbot1}  -{surfgref} 7 -8
+cell 106 0 fill       {latbot2}  -{surfgref} 6 -7
+cell 107 0 fill       {latbot3}  -{surfgref} 5 -6
+cell 108 0 fill   43 -{surffuel}  4 -5
+cell 109 0 fill       {latbot4}  -{surffuel} 3 -4
+cell 110 0 fill       {latplen}  -{surffuel} 2 -3
+cell 111 0 hastelloy -{surfgref}		1 -2
+cell 112 0 hastelloy  {surffuel} -{surfgref} 2 -5
+cell 113 0 hastelloy  {surfgref} -{surfhast} 1 -15
+cell 122 0 hastelloy -{surfhast} 15 -16
+cell 123 0 fill   41 -{surfgref} 11 -12 % holding shaft below plate
+cell 124 0 fill   42 -{surfgref} 12 -13 % top holding plate
+cell 125 0 fill   40 -{surfgref} 13 -14
+cell 126 0 blanket -17 14 -15
+
+
+cell 999 0 outside {surfhast} 1 -16
+cell 998 0 outside -1
+cell 997 0 outside  16
 	'''
 
 	cells = cells.format(**locals())

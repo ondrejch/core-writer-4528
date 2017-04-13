@@ -140,7 +140,7 @@ lat {nlat} 2  0.0 0.0  {n} {n}  {pitch} \n'''
 	x0 = 0.0
 	y0 = 0.0
 
-        # yes, yes it did take well over 7 hours to get x0, y0 right
+    # credit to Gavin Ridley for providing base lattice writer
 	x0 -= (n+0.5*n)*pitch/2.0 - .75*pitch
 	y0 -= n*sqrt(3.0)/4.0*pitch - sqrt(3.0)/4.0*pitch
 	for i in range(n): #y positions
@@ -160,10 +160,11 @@ lat {nlat} 2  0.0 0.0  {n} {n}  {pitch} \n'''
 				else:
 					#thisline += '5 ' #add a channel to geometry
 					thisline += uf
-                  # self.channels.append(CircularChannel(x,y,r)) #add channel to core object
-			else:
+			elif lat_r < core:
 				#thisline += '6 ' #add a blank
 				thisline += ub
+			else:
+				thisline += ub # universe 7 is a blank blanket
 		thisline += '\n'
 		lattice += thisline
 		
