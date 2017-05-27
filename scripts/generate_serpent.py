@@ -1,7 +1,7 @@
-#! /usr/bin/python
+#!/usr/bin/python
 #
 # Generate Serpent
-# A script that generates the Serpent input deck for our SMTF-MSBR
+# A script that generates the Serpent input deck for our MSiBR
 #
 # Calls the deck_writing function for each case we want to run
 
@@ -9,20 +9,20 @@ import deck
 import os
 import numpy as np
 
-# Parameters from the MCNP optimization
+# Parameters from the infinite lattice optimization
 FSF = .165 # fuel salt fraction
 PITCH =  14 # l * 2 from the lattice optimization script
-R2 = 5.4 #4
-SLIT = 0.323  # TODO: Calculate from relba (only important to center cell)
-RELBA = 0.75 # relative blanket fraction (same as in lattice analysis)
+R2 = 4.5
+SLIT = 0.323  # TODO: Calculate from relba (only effects to center cell)
+RELBA = 0.72 # relative blanket fraction (same as in lattice analysis)
 RFUEL = 152.4 # radius of fuel portion of the core
 RCORE = 213.36 # outer radius of core vessel
 ZCORE = 404
 ZREFL = 100
 TEMP = 700 # temp in C nominal 700C
 
-#Job submission settings:
-FILENAME = "msbr.inp"
+#Job submission settings: currently not in use
+FILENAME = "msibr.inp"
 qsubtemplate = 'qsubtemplate.txt'
 nperjob = 2 #num nodes per job
 ncpu = 8 #cpu per job
@@ -35,9 +35,9 @@ with open(qsubtemplate, 'r') as temp:
     for line in text:
        qtext.append(line.format(**locals())) 
 '''
-# From .108 cm to .327 cm
-# 73 different slit widths are attempted.
-slits = np.linspace(0.108, 0.327, 73)
+# From .108 cm to .327 cm. NOT ACTIVE
+# 73 different slit widths are attempted. NOT ACTIVE
+slits = np.linspace(0.108, .108, 1)
 
 for s in slits:
 
@@ -45,7 +45,7 @@ for s in slits:
 
 
     # Make the deck
-    serp_deck = deck.write_deck(fsf = FSF, relba = RELBA, pitch = PITCH, slit = s, temp=TEMP,
+    serp_deck = deck.write_deck(fsf = FSF, relba = RELBA, pitch = PITCH, slit = s, temp = TEMP,
                             rfuel = RFUEL, rcore = RCORE, r2 = R2, zcore = ZCORE, refl_ht = ZREFL,
                             name = title)
     
@@ -61,8 +61,8 @@ for s in slits:
         f.write(serp_deck)
 
     # place a qsub script with a descriptive name here.
-    with open('{}.sh'.format(dirname),'w') as f:
-        f.write(qtext)
+#    with open('{}.sh'.format(dirname),'w') as f:
+#        f.write(qtext)
 
     #and finally, submit the job.
     #os.system('qsub {}'.format(FILENAME+'.sh'))

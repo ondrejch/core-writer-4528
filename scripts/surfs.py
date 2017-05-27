@@ -8,9 +8,9 @@
 import math
 
 
-def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
-	'''Function to write the surfaces for our MSBR Serpent model
-	Inputs:
+def write_surfs(fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
+	'''Function to write the surfaces for our MSiBR Serpent model
+	Inputs: these are old
 		pitch:  hexagonal pitch of fuel cells
 		slit:   thickness of blanket salt slit
 		d:      circumradius of hexagon
@@ -31,10 +31,11 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
 		zrefl:	height of the axial reflector
 		gr_exp: graphite expansion coefficient m/m K
 	Output:
-		surfaces:   string containing the surface cards for the MSR'''
+		surfaces:   string containing the surface cards for the MSiBR'''
 	gr_exp = 4.14*10**(-6)
 	l=pitch/2.0
 	dgr = 15	
+	center_cr=2.6
 	plenum_vol = 37*28316.8 	# 37 ft^3 to cm^2
 	# Height of each plenum: inlet and outlet
 	plenum_ht = plenum_vol / (2*math.pi*rfuel**2)
@@ -43,7 +44,6 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
 	rgref = rcore_inner + gt
 	rhast = rgref + ht
 	# Calculate the actual dimensions based on our parameters
-	# Have benchmarked this against existing perl script--should be right
 	#
 	# inradius: half the pitch
 	hpitch = pitch/2.0
@@ -52,10 +52,8 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
 	# radius (inner): central fuel channel radius
 	hexarea = 2.0 * math.sqrt(3.0) * l**2
 	r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
-	#r1 = 2.06
 	# radius (outer): auxiliary fuel channel radius
-#	ro = ri / math.sqrt(6)
-	ro = 1.1
+	ro = 1.8
 	# c: a constant that determines how far along the circumradius the channels appear
 	c = (r1 + d*math.sqrt(3)/2.0) / ( d*(1.0 + math.sqrt(3)/2.0) )
 	# X and Y coordinates of ro
@@ -64,22 +62,18 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
 	
 	# Radial reflector scaling term
 	rs = 0.9
- # r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
+    # r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
-	#r2 = math.sqrt(2*r1**2 + 2*r1*thast + thast**2) # outer fuel cylinder
-	#r2 = r1 + 1.127
 	# Radius of outer fuel ring with equal volume to inner fuel channel
 	r3 = math.sqrt(r1**2 + r2**2)
 	rdiff = (r3 - r2)
 	# Establish a few additional dimensions
 	hexs = l   # radius of cell, outside slit
-	#ry = c*d
 	blanketfraction = 1.06923
 	blanketA0 = blanketfraction * r1**2 *math.pi
 	blanketarea = blanketA0 * relba
 	l2 = math.sqrt( l**2 - blanketarea / (2.0 * math.sqrt(3.0)))
 	hexg = l2  + (temp - 700)*gr_exp*l2 # radius of graphite, inside slit with thermal expansion 700C nominal temp
-	#hexg = 6.83
 	ry = c*d			# y coord of vertical channel
 
 	# hexf: top channel hexagon
@@ -94,8 +88,6 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
 
 
 	# Bottom (floor) with the transition later
-	# We want this to converge to another channel with concentric
-	# cylinders at the lower plenum
 	# Graphite thickness between central channel and aux channel
 	gt1 = d*c - rdiff - r1
 	# Next layer down concentric circles with half the graphite thickness
@@ -104,7 +96,7 @@ def write_surfs(fsf, relba, pitch, slit,temp, ro, r2, rs, rfuel, rcore_inner, rc
 	rh = r1 + thast									# radius of hastelloy cyl
 	r3_bot = math.sqrt(r1**2 + rh**2)               # outer fuel radius in lower plenum
 	rg = (gt1/2.0 + r3_bot)    				   			# radius of graphite hex
-	# And cut off the bottom 10 inches below that
+	# cut off the bottom 10 inches below that
 	ztrans1 = 0 - 10*2.54
 	# Next layer down, the concentric circles w/ hastelloy
 	rh2 = r3_bot + thast		# Outer hastelloy pipe
@@ -252,7 +244,7 @@ surf 205 cyl   0   0   {r3}          % OUTER FUEL RING
 %------ graphite hexagon and control rod channels Universe 3 ------
 surf 301 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
 surf 302 hexxc 0   0   {hexs}	     % HEX FOR SLIT
-surf 303 cyl   0   0   {r1}  	     % CENTER HOLE
+surf 303 cyl   0   0   {center_cr}  	     % CENTER HOLE
 surf 304 cyl   0   {ry}   {ro}	     % OUTER HOLES x 6 CONTROL RODS
 surf 305 cyl   0  -{ry}   {ro}       %           ||
 surf 306 cyl   {rox}  {roy}  {ro}    %           ||

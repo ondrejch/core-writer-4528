@@ -6,7 +6,7 @@
 def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
 				surffuel=30, surfcore=31, surfgref=32, surfhast=29):
 	'''Function to write cell cards for Serpent input deck.
-	Inputs:
+	Inputs: these are old
 		universes:		Tuple(12) containing the following.
 		 ub, uf, uc:	 Universe number of blanket, fuel, central cells
 		 uup, ul#:		 Universe number of upper/lower plenum assembly
@@ -30,6 +30,7 @@ def write_cells(universes=range(1,1+12), lattices=range(33,33+7), \
 	latmid, lattop, latbot1, latbot2, latbot3, \
 	latbot4, latplen = lattices
 	
+# THESE ARE THE OLD CELL DEFINITIONS THEY ARE KEPT IN CASE THE NEW ONES BREAK
 	'''cells = \'''
 %------define cells--------------------
 
@@ -181,7 +182,7 @@ cell 997 0 outside  82
 
 
 
-# New cell definitions - WARNING!!! THESE ARE NOT USED IN THE CURRENT VERSION
+# New cell definitions
 	cells = '''
 %------define cells--------------------
 % Universe {ub}: BLANKET CELL U1

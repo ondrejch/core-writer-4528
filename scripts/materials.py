@@ -5,7 +5,7 @@
 
 def write_materials(temp):
 	'''Function to write material cards for Serpent input deck.
-Inputs: 
+Inputs: these are old
 	temp: core temperature
     lib:    String containing the neutron cross section library to use.
     scat_lib : thermal scattering library
@@ -13,14 +13,22 @@ Outputs:
     mats:    String containing the material cards'''
 	temp += 273 # convert C to K to more easily use libraries
 	# set neutron cross section library 
+	if temp >= 300 and temp < 600: lib = '03c'
 	if temp >= 600 and temp < 900: lib = '06c'
-	if temp >= 900 and temp < 1200: lib = '09c' 
+	if temp >= 900 and temp < 1200: lib = '09c'
+	if temp >= 1200 and temp < 1500: lib = '12c' 
     
 	# set thermal scattering libraries
+	if temp == 400: scat_lib = 'gre7.14t'
+	if temp > 400 and temp < 600: scat_lib = 'gre7.14t gre7.16t'
+	if temp == 600: scat_lib = 'gre7.16t'
+	if temp > 600 and temp < 800: scat_lib = 'gre7.16t gre7.18t'
 	if temp == 800: scat_lib = 'gre7.18t'
 	if temp > 800 and temp < 1000: scat_lib = 'gre7.18t gre7.20t'
 	if temp == 1000: scat_lib = 'gre7.20t'
 	if temp > 1000 and temp < 1200: scat_lib = 'gre7.20t gre7.22t'
+	if temp == 1200: scat_lib = 'gre7.22t'
+	if temp > 1200 and temp < 1500: scat_lib = 'gre7.22t gre7.24t'
     
 	# change density of major components to match temperature (reference DMSR project) 973K nominal
 	fuel_dens = 2.03434 - (temp - 973)*1*10**(-3)

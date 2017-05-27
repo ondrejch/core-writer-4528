@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Deck.py
-# A script that generates the Serpent input deck for our SMTF-MSBR
+# A script that generates the Serpent input deck for the MSiBR
 	
 import math 
 import lattice, surfs, cells, materials
@@ -9,11 +9,11 @@ import lattice, surfs, cells, materials
 
 def write_deck(fsf = 0.07, relba = 0.08,\
     pitch = 11.500, \
-    slit = 0.2, temp=700, r2 = 3.3, rs = 0.9, \
+    slit = 0.2, temp = 700, r2 = 3.3, rs = 0.9, \
     rfuel = 150, rcore = 215, zcore = 400, refl_ht = 100, \
     name = 'Test deck'):
 	'''Write the actual Serpent deck
-	Inputs:
+	Inputs: these are old
 * channel_pitch:  hexagonal pitch of fuel cells [cm]
 * channel_r2: inner radius of the outer fuel channel [cm]
 * channel_top_r: radius of the channel holder knob [cm]                          
@@ -42,8 +42,7 @@ def write_deck(fsf = 0.07, relba = 0.08,\
 		output:		String containing the entire input deck
 	'''	
 
-	# Read the initial values from some external source.
-	# Right now, I'm just plugging them in to test the script.
+	# Read values from generate_serpent.py
 	FSF = 	fsf
 	PITCH = pitch # cm
 	SLIT = 	slit  # cm
@@ -53,10 +52,6 @@ def write_deck(fsf = 0.07, relba = 0.08,\
 	fuel_cells = int(rfuel/PITCH)
 	blan_cells = 1
 
-	# radius (outer): auxiliary fuel channel radius
-    #ro = ri / math.sqrt(6)
-	ro = 1.1
-	#--------------------------------
 	# Begin writing the input deck
 	
 	output = '''\
@@ -111,7 +106,7 @@ Advisor: Dr. Ondrej Chvala
 	rgref = rcore + gt
 	rhast = rgref + ht
 	
-	surface_cards = surfs.write_surfs(FSF, RELBA, PITCH, SLIT, TEMP, ro, r2, rs, \
+	surface_cards = surfs.write_surfs(FSF, RELBA, PITCH, SLIT, TEMP, r2, rs, \
 									  rfuel, rcore_inner, rcore_outer, \
 									  zcore, plenum_ht, refl_ht)
 	output += surface_cards
