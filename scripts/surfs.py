@@ -1,12 +1,10 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 #
 # Surfs
 # Calculate dimensions for each of the surfaces based off the MSBR cell dimensions
 # and output the surface cards for the Serpent input deck.
 
-
 import math
-
 
 def write_surfs(fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
 	'''Function to write the surfaces for our MSiBR Serpent model
@@ -48,21 +46,21 @@ def write_surfs(fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_
 	# inradius: half the pitch
 	hpitch = pitch/2.0
 	# circumradius: distance from center to corner
-	d = (hpitch - slit) * 2.0/math.sqrt(3)  
+	d = (hpitch - slit) * 2.0/math.sqrt(3.0)  
 	# radius (inner): central fuel channel radius
 	hexarea = 2.0 * math.sqrt(3.0) * l**2
 	r1 = math.sqrt(hexarea*fsf/(2.0*math.pi) )
 	# radius (outer): auxiliary fuel channel radius
 	ro = 1.8
 	# c: a constant that determines how far along the circumradius the channels appear
-	c = (r1 + d*math.sqrt(3)/2.0) / ( d*(1.0 + math.sqrt(3)/2.0) )
+	c = (r1 + d*math.sqrt(3.0)/2.0) / ( d*(1.0 + math.sqrt(3.0)/2.0) )
 	# X and Y coordinates of ro
-	rox = c*d*math.sqrt(3)/2.0
+	rox = c*d*math.sqrt(3.0)/2.0
 	roy = c*d*0.5
 	
 	# Radial reflector scaling term
 	rs = 0.9
-    # r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
+        # r2 is the outer fuel radius; thast = hastelloy thickness (1/8 in)
 	thast = 1.0/8 * 2.54							# hastelloy thickness
 	# Radius of outer fuel ring with equal volume to inner fuel channel
 	r3 = math.sqrt(r1**2 + r2**2)
@@ -73,11 +71,11 @@ def write_surfs(fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_
 	blanketA0 = blanketfraction * r1**2 *math.pi
 	blanketarea = blanketA0 * relba
 	l2 = math.sqrt( l**2 - blanketarea / (2.0 * math.sqrt(3.0)))
-	hexg = l2  + (temp - 700)*gr_exp*l2 # radius of graphite, inside slit with thermal expansion 700C nominal temp
+	hexg = l2  + (temp - 700.0)*gr_exp*l2 # radius of graphite, inside slit with thermal expansion 700C nominal temp
 	ry = c*d			# y coord of vertical channel
 
 	# hexf: top channel hexagon
-	hexf = math.sqrt(3)/2.0*(d*c) + rdiff
+	hexf = math.sqrt(3.0)/2.0*(d*c) + rdiff
 	zhexf1 = zcore + 2.0*rdiff	# top of fuel channel (salt)
 	# Make the "roof" as thick as the "wall" of the graphite hexagon
 	zhexf2 = zhexf1 + (hexg - hexf) # top of fuel channel (graphite)
@@ -92,7 +90,7 @@ def write_surfs(fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_
 	gt1 = d*c - rdiff - r1
 	# Next layer down concentric circles with half the graphite thickness
 	# thast = hastelloy thickness (1/8 in)
-	thast = 1.0/8 * 2.54							# hastelloy thickness
+	thast = 1.0/8.0 * 2.54							# hastelloy thickness
 	rh = r1 + thast									# radius of hastelloy cyl
 	r3_bot = math.sqrt(r1**2 + rh**2)               # outer fuel radius in lower plenum
 	rg = (gt1/2.0 + r3_bot)    				   			# radius of graphite hex
@@ -101,7 +99,7 @@ def write_surfs(fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_
 	# Next layer down, the concentric circles w/ hastelloy
 	rh2 = r3_bot + thast		# Outer hastelloy pipe
 	# Cut off this layer 3 inches down
-	ztrans2 = ztrans1 - 3*2.54
+	ztrans2 = ztrans1 - 3.0*2.54
 
 	# Then, the lower plena
 	zitop = ztrans2 - pht	# z of the top of the inlet plenum
@@ -111,14 +109,14 @@ def write_surfs(fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_
 	# Then, the very bottom of the entire core
 	zbot = zobot - (rhast - rgref)
 
-    # radial reflector 
+        # radial reflector 
 	rs = 0.9 
 	rr = rs*hexg  # reflector size
 	hsl = 3.97  # holding shaft lower radius
 	hsu = hsl*0.8     # holding shaft upper radius
 	axial_top = zhexf2+30.48
-	zplate = axial_top + 12
-	zshaft = zplate + 5 
+	zplate = axial_top + 12.0
+	zshaft = zplate + 5.0
 	
 	# lower plenum cone calculations: naming scheme goes outward from center
 	conez1 = ((0-ztrans1)/(r2-rh))*r2      
@@ -205,15 +203,15 @@ surf 3503 cone 0 0 0 {hexg} -{conez3}
 %------ main universe ------
 %% vertical core plane divisions
 
-surf 16 pz    {zhasttop}
-surf 15 pz    {zgreftop}
-surf 14 pz {zshaft}   % top of holding shafts
-surf 13 pz {zplate}   % top of holding plate
-surf 12 pz {axial_top}
-surf 11 pz {zhexf2}
-surf 10 pz    {zhexf2}
-surf 9 pz    {zcore}		     % HEIGHT OF CORE
-surf 8 pz    0			    % BOTTOM OF CORE
+surf 16 pz   {zhasttop}
+surf 15 pz   {zgreftop}
+surf 14 pz   {zshaft}           % top of holding shafts
+surf 13 pz   {zplate}           % top of holding plate
+surf 12 pz   {axial_top}
+surf 11 pz   {zhexf2}
+surf 10 pz   {zhexf2}
+surf 9 pz    {zcore}		% HEIGHT OF CORE
+surf 8 pz    0			% BOTTOM OF CORE
 surf 7 pz    {ztrans1}
 surf 6 pz    {ztrans2}
 surf 5 pz    {zitop}
@@ -223,72 +221,72 @@ surf 2 pz    {zobot}
 surf 1 pz    {zbot}
 
 %% radial bounds
-surf 17 cyl 0 0 {rgref} % blanket above core
+surf 17 cyl   0   0   {rgref}   % blanket above core
 surf 18 cyl   0   0   {rfuel}
 surf 19 cyl   0   0   {rgref}
 surf 20 cyl   0   0   {rhast}
 
 
 %------ blanket cell Universe 1 ------
-surf 101 hexxc 0   0   {rr}          % HEX FOR REFLECTOR GRAPHITE
+surf 101 hexxc 0   0   {rr}     % HEX FOR REFLECTOR GRAPHITE
 
 
 %------ graphite hexagon and fuel channel cells Universe 2 ------	
-surf 201 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
-surf 202 hexxc 0   0   {hexs}	     % HEX FOR SLIT
-surf 203 cyl   0   0   {r1}	         % CENTER HOLE
-surf 204 cyl   0   0   {r2}          % INTERMEDIATE GRAPHITE RING
-surf 205 cyl   0   0   {r3}          % OUTER FUEL RING
+surf 201 hexxc 0   0   {hexg}	% HEX FOR GRAPHITE
+surf 202 hexxc 0   0   {hexs}	% HEX FOR SLIT
+surf 203 cyl   0   0   {r1}	% CENTER HOLE
+surf 204 cyl   0   0   {r2}     % INTERMEDIATE GRAPHITE RING
+surf 205 cyl   0   0   {r3}     % OUTER FUEL RING
 
 
 %------ graphite hexagon and control rod channels Universe 3 ------
-surf 301 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
-surf 302 hexxc 0   0   {hexs}	     % HEX FOR SLIT
-surf 303 cyl   0   0   {center_cr}  	     % CENTER HOLE
-surf 304 cyl   0   {ry}   {ro}	     % OUTER HOLES x 6 CONTROL RODS
-surf 305 cyl   0  -{ry}   {ro}       %           ||
-surf 306 cyl   {rox}  {roy}  {ro}    %           ||
-surf 307 cyl  -{rox}  {roy}  {ro}    %          _||_
-surf 308 cyl  -{rox} -{roy}  {ro}    %          \  /
-surf 309 cyl   {rox} -{roy}  {ro}    % __________\/____________
+surf 301 hexxc 0   0   {hexg}	    % HEX FOR GRAPHITE
+surf 302 hexxc 0   0   {hexs}	    % HEX FOR SLIT
+surf 303 cyl   0   0   {center_cr}  % CENTER HOLE
+surf 304 cyl   0   {ry}   {ro}	    % OUTER HOLES x 6 CONTROL RODS
+surf 305 cyl   0  -{ry}   {ro}      %           ||
+surf 306 cyl   {rox}  {roy}  {ro}   %           ||
+surf 307 cyl  -{rox}  {roy}  {ro}   %          _||_
+surf 308 cyl  -{rox} -{roy}  {ro}   %          \  /
+surf 309 cyl   {rox} -{roy}  {ro}   % __________\/____________
 
 
 %------ upper channel Universe 4 ------
-surf 401 hexxc 0   0   {hexg}	      % HEX FOR GRAPHITE
-surf 402 hexxc 0   0   {hexs}	      % HEX FOR SLIT
-surf 403 cyl   0   0   {r3}           % OUTER FUEL RING
-surf 404 pz    {zcore}		          % HEIGHT OF CORE
+surf 401 hexxc 0   0   {hexg}	    % HEX FOR GRAPHITE
+surf 402 hexxc 0   0   {hexs}	    % HEX FOR SLIT
+surf 403 cyl   0   0   {r3}         % OUTER FUEL RING
+surf 404 pz    {zcore}	            % HEIGHT OF CORE
 surf 405 pz    {zhexf1}
 surf 406 pz    {zhexf2}
 
 
 %------ upper control Universe 5 ------
-surf 501 hexxc 0   0   {hexg}	     % HEX FOR GRAPHITE
-surf 502 hexxc 0   0   {hexs}	      % HEX FOR SLIT
-surf 503 hexxc 0   0   {hexf}          % HEX FOR FUEL
-surf 504 pz    {zcore}		     % HEIGHT OF CORE
+surf 501 hexxc 0   0   {hexg}	    % HEX FOR GRAPHITE
+surf 502 hexxc 0   0   {hexs}	    % HEX FOR SLIT
+surf 503 hexxc 0   0   {hexf}       % HEX FOR FUEL
+surf 504 pz    {zcore}		    % HEIGHT OF CORE
 surf 505 pz    {zhexf1}
 surf 506 pz    {zhexf2}
 
 
 %------ lower control Universe 6 ------
-surf 601 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 601 hexxc 0   0   {hexs}	    % HEX FOR SLIT
 surf 602 cyl   0   0   {r1}	    % CENTER HOLE
-surf 603 cyl   0   0   {rh}   % hastelloy tube radius
-surf 604 cyl 0  0 {r3_bot} % outer fuel radius for lower plenum
-surf 605 hexxc 0   0   {rg}	% Hex for fuel transition
+surf 603 cyl   0   0   {rh}         % hastelloy tube radius
+surf 604 cyl   0   0   {r3_bot}     % outer fuel radius for lower plenum
+surf 605 hexxc 0   0   {rg}	    % Hex for fuel transition
 
 
 %------ blank blanket cell Universe 7 ------
-surf 701 hexxc 0 0 {hexg}
+surf 701 hexxc 0   0   {hexg}
 
 
 %------ holding shafts on top of plate Universe 8 ------
-surf 801 cyl 0 0 {hsu}     % holding shaft
+surf 801 cyl   0   0   {hsu}        % holding shaft
 
 
 %------ holding shafts under plate Universe 9 ------
-surf 901 cyl 0 0 {hsl}
+surf 901 cyl   0   0   {hsl}
 
 
 %------ hastelloy hex Universe 11 ------
@@ -300,17 +298,17 @@ surf 1001 hexxc 0   0   {hexs}	      % HEX FOR SLIT
 
 
 %------ holding plate Universe 12 ------
-surf 1201 cylz 0 0 {hsu}
+surf 1201 cylz  0   0   {hsu}
 
 
 %------ lower channel 1 Universe 25 ------
 surf 2501 hexxc 0   0   {hexs}      % HEX FOR SLIT
-surf 2502 cyl   0   0   {r1}	       % CENTER HOLE
+surf 2502 cyl   0   0   {r1}	    % CENTER HOLE
 surf 2503 cyl   0   0   {rh}        % HASTELLOY PIPE RADIUS
 surf 2504 cyl   0   0   {r2}        % OUTER FUEL CYL RADIUS
-surf 2505 cone 0 0 0 {r2} -{conez1}
-surf 2506 cone 0 0 0 {r3} -{conez2}
-surf 2507 cone 0 0 0 {hexg} -{conez3}
+surf 2505 cone  0   0 0 {r2} -{conez1}
+surf 2506 cone  0   0 0 {r3} -{conez2}
+surf 2507 cone  0   0 0 {hexg} -{conez3}
 
 
 %------ lower channel 2 Universe 26------
@@ -322,36 +320,34 @@ surf 2605 cyl   0   0   {rh2}      % OUTER HASTELLOY PIPE
 
 
 %------ penetration to inlet plenum Universe 27 ------
-surf 2701 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 2701 hexxc 0   0   {hexs}	    % HEX FOR SLIT
 surf 2702 cyl   0   0   {r1}	    % CENTER HOLE
-surf 2703 cyl 0  0 {r3_bot} % outer fuel radius for lower plenum
-surf 2704 cyl   0   0   {rh}   % hastelloy tube radius
+surf 2703 cyl   0   0   {r3_bot}    % outer fuel radius for lower plenum
+surf 2704 cyl   0   0   {rh}        % hastelloy tube radius
 
 
 %------ penetration to outlet plenum Universe 28 ------
-surf 2801 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 2801 hexxc 0   0   {hexs}	    % HEX FOR SLIT
 surf 2802 cyl   0   0   {r1}	    % CENTER HOLE
 
 
 %------ lower plenum top Universe 1111 ------
-surf 111101 hexxc 0   0   {hexs}	      % HEX FOR SLIT
+surf 111101 hexxc 0   0   {hexs}    % HEX FOR SLIT
 surf 111102 cyl   0   0   {r1}	    % CENTER HOLE
-surf 111103 cyl   0   0   {rh}   % hastelloy tube radius
+surf 111103 cyl   0   0   {rh}      % hastelloy tube radius
 
 	'''
-
-
-
 
 	surfaces = surfaces.format(**locals())
 	
 	return surfaces
 
+# (fsf, relba, pitch, slit,temp, r2, rs, rfuel, rcore_inner, rcore_outer, zcore, pht, zrefl):
 
 if __name__ == '__main__':
-	print "This is a module to write surfaces for the MSR core."
-	raw_input("Press Ctrl+C to quit, or enter else to test it. ")
-	print write_surfs(pitch = 11.5, slit = 0.323, d=6.267, r1 = 2.2, ro = 0.9, \
+	print("This is a module to write surfaces for the MSR core.")
+	input("Press Ctrl+C to quit, or enter else to test it. ")
+	print( write_surfs(pitch = 11.5, slit = 0.323, d=6.267, r1 = 2.2, ro = 0.9, \
 					rox = 3.54, roy = 2.05, c = 0.65, \
 					rfuel = 400, rcore = 427, rgref = 450, rhast = 470, \
-					zcore = 100, pht = 10, zrefl = 35)
+					zcore = 100, pht = 10, zrefl = 35))

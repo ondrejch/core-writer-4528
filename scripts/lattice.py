@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 #
 # Lattice: Script containing a function to write a hexagonal SERPENT lattice for the MSR project.
 
@@ -61,7 +61,7 @@ lat {nlat} 2  0.0 0.0  {n} {n}  {pitch} \n'''
 			x = x0 + (j+0.5*i)*pitch #x pos
 			lat_r = sqrt(x**2+y**2)  #radius from lattice center
 			if DEBUG:
-				print x, y, lat_r, lat_r < rmax
+				print( x, y, lat_r, lat_r < rmax)
 			if lat_r < rmax:             
                    # if lattice radius is in the center, write the unique central channel
 				if int(x) == 0 and int(y) == 0:
@@ -80,8 +80,8 @@ lat {nlat} 2  0.0 0.0  {n} {n}  {pitch} \n'''
 
 # This executes if someone tries to run the module
 if __name__ == '__main__':
-	print "This is a module which generates lattice cards for Serpent."
+	print("This is a module which generates lattice cards for Serpent.")
 	a = raw_input("Press 'enter' to exit, or type anything to run a test. ")
 	if a:
-		print '_____________________________\n'
-		print write_lattice()
+		print( '_____________________________\n')
+		print( write_lattice())

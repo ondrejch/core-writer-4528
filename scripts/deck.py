@@ -107,8 +107,8 @@ Advisor: Dr. Ondrej Chvala
 	rhast = rgref + ht
 	
 	surface_cards = surfs.write_surfs(FSF, RELBA, PITCH, SLIT, TEMP, r2, rs, \
-									  rfuel, rcore_inner, rcore_outer, \
-									  zcore, plenum_ht, refl_ht)
+					  rfuel, rcore_inner, rcore_outer, \
+					  zcore, plenum_ht, refl_ht)
 	output += surface_cards
 	
 	cell_cards = cells.write_cells(UNIVERSES, LATS, 18, 31, 19, 20)
@@ -174,5 +174,5 @@ plot 3 3000 3000 29 %[250 -100 100 -100 100]
 
 if __name__ == '__main__':
 	print("This is the Serpent deck writing function for the MSR project.")
-	raw_input("Press Ctrl+C to exit, or Enter to test it. ")
+	input("Press Ctrl+C to exit, or Enter to test it. ")
 	print(write_deck())
